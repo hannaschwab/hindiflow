@@ -11,6 +11,8 @@ import PullToRefreshWrapper from "@/components/common/PullToRefreshWrapper";
 import CategoryPicker from "@/components/words/CategoryPicker";
 import { useCategories } from "@/hooks/useCategories";
 
+const MIN_CATEGORY_SIZE = 5;
+
 function CategorySelect({ value, onChange }) {
   const { allCategories } = useCategories();
   const label = value === "all" ? "All Categories" : value.replace(/_/g, " ");
@@ -87,27 +89,44 @@ export default function WordList() {
   });
 
   const [autoCategorizing, setAutoCategorizing] = useState(false);
+  const { addCategory } = useCategories();
 
   const handleAutoCategorize = async () => {
     const uncategorized = words.filter(w => !w.category || w.category === "other");
     if (uncategorized.length === 0) { toast.info("All words already have a category!"); return; }
     setAutoCategorizing(true);
-    let updated = 0;
+
+    // Step 1: Ask LLM for a suggested category for each word
+    const proposals = [];
     for (const word of uncategorized) {
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Categorize the Hindi word "${word.hindi}" (meaning: "${word.english}") into exactly one of these categories: greetings, food, travel, numbers, family, colors, verbs, adjectives, phrases, other. Reply with only the category name, nothing else.`,
+        prompt: `Categorize the Hindi word "${word.hindi}" (meaning: "${word.english}") into a short, descriptive category name (e.g. greetings, food, travel, numbers, family, colors, verbs, adjectives, phrases, body parts, emotions, clothing, animals, time, etc). Reply with only the lowercase category name, nothing else.`,
         response_json_schema: { type: "object", properties: { category: { type: "string" } } }
       });
-      const validCats = ["greetings","food","travel","numbers","family","colors","verbs","adjectives","phrases","other"];
-      const category = validCats.includes(result?.category) ? result.category : "other";
-      if (category !== "other") {
-        await base44.entities.Vocabulary.update(word.id, { category });
+      const suggested = result?.category?.toLowerCase().trim().replace(/\s+/g, "_") || "other";
+      proposals.push({ word, suggested });
+    }
+
+    // Step 2: Count occurrences of each proposed category
+    const counts = {};
+    for (const { suggested } of proposals) {
+      counts[suggested] = (counts[suggested] || 0) + 1;
+    }
+
+    // Step 3: Save only categories that have >= MIN_CATEGORY_SIZE words; register new ones
+    let updated = 0;
+    for (const { word, suggested } of proposals) {
+      const finalCat = (counts[suggested] >= MIN_CATEGORY_SIZE) ? suggested : "other";
+      if (finalCat !== "other") {
+        addCategory(finalCat);
+        await base44.entities.Vocabulary.update(word.id, { category: finalCat });
         updated++;
       }
     }
+
     await queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
     setAutoCategorizing(false);
-    toast.success(`Categorized ${updated} of ${uncategorized.length} words!`);
+    toast.success(`Categorized ${updated} of ${uncategorized.length} words! (min ${MIN_CATEGORY_SIZE} per category)`);
   };
 
   const filtered = words.filter(w => {
