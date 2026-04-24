@@ -1,67 +1,10 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronDown } from "lucide-react";
-
-const CATEGORIES = ["greetings", "food", "travel", "numbers", "family", "colors", "verbs", "adjectives", "phrases", "other"];
-
-function CategoryPicker({ value, onChange }) {
-  const [open, setOpen] = useState(false);
-  const isMobile = window.innerWidth < 768;
-
-  const trigger = (
-    <button
-      type="button"
-      onClick={() => setOpen(true)}
-      className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm capitalize"
-    >
-      {value}
-      <ChevronDown className="w-4 h-4 opacity-50" />
-    </button>
-  );
-
-  const items = (
-    <div className="p-2 space-y-1">
-      {CATEGORIES.map(c => (
-        <button
-          key={c}
-          type="button"
-          onClick={() => { onChange(c); setOpen(false); }}
-          className={`w-full text-left px-3 py-2 rounded-lg text-sm capitalize transition-colors ${value === c ? "bg-primary text-primary-foreground" : "hover:bg-secondary"}`}
-        >
-          {c.replace(/_/g, " ")}
-        </button>
-      ))}
-    </div>
-  );
-
-  if (isMobile) {
-    return (
-      <Drawer open={open} onOpenChange={setOpen}>
-        <div onClick={() => setOpen(true)}>{trigger}</div>
-        <DrawerContent>
-          <DrawerHeader><DrawerTitle>Select Category</DrawerTitle></DrawerHeader>
-          <div className="pb-6">{items}</div>
-        </DrawerContent>
-      </Drawer>
-    );
-  }
-
-  return (
-    <div className="relative">
-      {trigger}
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute z-50 mt-1 w-full bg-popover border border-border rounded-lg shadow-lg">{items}</div>
-        </>
-      )}
-    </div>
-  );
-}
+import CategoryPicker from "@/components/words/CategoryPicker";
 
 export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
   const [form, setForm] = useState({
@@ -80,40 +23,14 @@ export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
     onOpenChange(false);
   };
 
-  const formContent = (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Label>Hindi *</Label>
-          <Input value={form.hindi} onChange={e => setForm({ ...form, hindi: e.target.value })} />
-        </div>
-        <div>
-          <Label>English *</Label>
-          <Input value={form.english} onChange={e => setForm({ ...form, english: e.target.value })} />
-        </div>
-      </div>
-      <div>
-        <Label>Transliteration</Label>
-        <Input value={form.transliteration} onChange={e => setForm({ ...form, transliteration: e.target.value })} />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Label>Example (Hindi)</Label>
-          <Input value={form.example_hindi} onChange={e => setForm({ ...form, example_hindi: e.target.value })} />
-        </div>
-        <div>
-          <Label>Example (English)</Label>
-          <Input value={form.example_english} onChange={e => setForm({ ...form, example_english: e.target.value })} />
-        </div>
-      </div>
-      <div>
-        <Label>Category</Label>
-        <CategoryPicker value={form.category} onChange={v => setForm({ ...form, category: v })} />
-      </div>
-      <Button type="submit" className="w-full" disabled={!form.hindi || !form.english}>
-        Save Changes
-      </Button>
-    </form>
+  const categoryTrigger = (
+    <button
+      type="button"
+      className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm capitalize"
+    >
+      {form.category}
+      <ChevronDown className="w-4 h-4 opacity-50" />
+    </button>
   );
 
   return (
@@ -122,7 +39,43 @@ export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
         <DialogHeader>
           <DialogTitle>Edit Word</DialogTitle>
         </DialogHeader>
-        {formContent}
+        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Hindi *</Label>
+              <Input value={form.hindi} onChange={e => setForm({ ...form, hindi: e.target.value })} />
+            </div>
+            <div>
+              <Label>English *</Label>
+              <Input value={form.english} onChange={e => setForm({ ...form, english: e.target.value })} />
+            </div>
+          </div>
+          <div>
+            <Label>Transliteration</Label>
+            <Input value={form.transliteration} onChange={e => setForm({ ...form, transliteration: e.target.value })} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Example (Hindi)</Label>
+              <Input value={form.example_hindi} onChange={e => setForm({ ...form, example_hindi: e.target.value })} />
+            </div>
+            <div>
+              <Label>Example (English)</Label>
+              <Input value={form.example_english} onChange={e => setForm({ ...form, example_english: e.target.value })} />
+            </div>
+          </div>
+          <div>
+            <Label>Category</Label>
+            <CategoryPicker
+              value={form.category}
+              onChange={v => setForm({ ...form, category: v })}
+              trigger={categoryTrigger}
+            />
+          </div>
+          <Button type="submit" className="w-full" disabled={!form.hindi || !form.english}>
+            Save Changes
+          </Button>
+        </form>
       </DialogContent>
     </Dialog>
   );

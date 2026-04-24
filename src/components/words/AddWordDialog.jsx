@@ -1,77 +1,17 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Loader2, ChevronDown } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-
-const CATEGORIES = ["greetings", "food", "travel", "numbers", "family", "colors", "verbs", "adjectives", "phrases", "other"];
-
-function CategoryPicker({ value, onChange, disabled }) {
-  const [open, setOpen] = useState(false);
-  const isMobile = window.innerWidth < 768;
-
-  const trigger = (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={() => setOpen(true)}
-      className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm capitalize disabled:opacity-50"
-    >
-      {value}
-      <ChevronDown className="w-4 h-4 opacity-50" />
-    </button>
-  );
-
-  const items = (
-    <div className="p-2 space-y-1">
-      {CATEGORIES.map(c => (
-        <button
-          key={c}
-          type="button"
-          onClick={() => { onChange(c); setOpen(false); }}
-          className={`w-full text-left px-3 py-2 rounded-lg text-sm capitalize transition-colors ${value === c ? "bg-primary text-primary-foreground" : "hover:bg-secondary"}`}
-        >
-          {c.replace(/_/g, " ")}
-        </button>
-      ))}
-    </div>
-  );
-
-  if (isMobile) {
-    return (
-      <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Select Category</DrawerTitle>
-          </DrawerHeader>
-          <div className="pb-6">{items}</div>
-        </DrawerContent>
-      </Drawer>
-    );
-  }
-
-  return (
-    <>
-      {trigger}
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute z-50 mt-1 w-full bg-popover border border-border rounded-lg shadow-lg">
-            {items}
-          </div>
-        </>
-      )}
-    </>
-  );
-}
+import CategoryPicker from "@/components/words/CategoryPicker";
+import { useCategories } from "@/hooks/useCategories";
 
 export default function AddWordDialog({ onAdd }) {
   const [open, setOpen] = useState(false);
   const [categorizing, setCategorizing] = useState(false);
+  const { allCategories } = useCategories();
   const [form, setForm] = useState({
     hindi: "", transliteration: "", english: "",
     example_hindi: "", example_english: "", category: "other"
@@ -84,7 +24,7 @@ export default function AddWordDialog({ onAdd }) {
       prompt: `Categorize the Hindi word "${hindi}" (meaning: "${english}") into exactly one of these categories: greetings, food, travel, numbers, family, colors, verbs, adjectives, phrases, other. Reply with only the category name, nothing else.`,
       response_json_schema: { type: "object", properties: { category: { type: "string" } } }
     });
-    const category = CATEGORIES.includes(result?.category) ? result.category : "other";
+    const category = allCategories.includes(result?.category) ? result.category : "other";
     setForm(f => ({ ...f, category }));
     setCategorizing(false);
   };
@@ -148,7 +88,16 @@ export default function AddWordDialog({ onAdd }) {
             <CategoryPicker
               value={form.category}
               onChange={v => setForm({...form, category: v})}
-              disabled={categorizing}
+              trigger={
+                <button
+                  type="button"
+                  disabled={categorizing}
+                  className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm capitalize disabled:opacity-50"
+                >
+                  {form.category}
+                  <ChevronDown className="w-4 h-4 opacity-50" />
+                </button>
+              }
             />
           </div>
           <Button type="submit" className="w-full" disabled={!form.hindi || !form.english}>
