@@ -54,10 +54,13 @@ export default function TutorAvatar({ state = "idle" }) {
         key={state + "-label"}
         initial={{ opacity: 0, y: -4 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-1.5"
+        className="flex flex-col items-center gap-0.5"
       >
-        <span className={`w-2 h-2 rounded-full ${config.color}`} />
-        <span className="text-xs text-muted-foreground font-medium">{config.label}</span>
+        <span className="text-sm font-semibold text-foreground">Apoorva</span>
+        <div className="flex items-center gap-1.5">
+          <span className={`w-2 h-2 rounded-full ${config.color}`} />
+          <span className="text-xs text-muted-foreground">{config.label}</span>
+        </div>
       </motion.div>
     </div>
   );
