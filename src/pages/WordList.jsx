@@ -2,7 +2,9 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
-import { Search, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Search, ChevronDown, Sparkles, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import WordRow from "@/components/words/WordRow";
 import AddWordDialog from "@/components/words/AddWordDialog";
 import PullToRefreshWrapper from "@/components/common/PullToRefreshWrapper";
@@ -84,6 +86,30 @@ export default function WordList() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] }),
   });
 
+  const [autoCategorizing, setAutoCategorizing] = useState(false);
+
+  const handleAutoCategorize = async () => {
+    const uncategorized = words.filter(w => !w.category || w.category === "other");
+    if (uncategorized.length === 0) { toast.info("All words already have a category!"); return; }
+    setAutoCategorizing(true);
+    let updated = 0;
+    for (const word of uncategorized) {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Categorize the Hindi word "${word.hindi}" (meaning: "${word.english}") into exactly one of these categories: greetings, food, travel, numbers, family, colors, verbs, adjectives, phrases, other. Reply with only the category name, nothing else.`,
+        response_json_schema: { type: "object", properties: { category: { type: "string" } } }
+      });
+      const validCats = ["greetings","food","travel","numbers","family","colors","verbs","adjectives","phrases","other"];
+      const category = validCats.includes(result?.category) ? result.category : "other";
+      if (category !== "other") {
+        await base44.entities.Vocabulary.update(word.id, { category });
+        updated++;
+      }
+    }
+    await queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
+    setAutoCategorizing(false);
+    toast.success(`Categorized ${updated} of ${uncategorized.length} words!`);
+  };
+
   const filtered = words.filter(w => {
     const matchSearch = !search || 
       w.hindi?.toLowerCase().includes(search.toLowerCase()) ||
@@ -109,7 +135,13 @@ export default function WordList() {
           <h1 className="text-2xl font-bold text-foreground">Word List</h1>
           <p className="text-sm text-muted-foreground mt-1">{words.length} words in your collection</p>
         </div>
-        <AddWordDialog onAdd={createMutation.mutate} />
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="gap-2" onClick={handleAutoCategorize} disabled={autoCategorizing}>
+            {autoCategorizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            {autoCategorizing ? "Categorizing..." : "Auto-categorize"}
+          </Button>
+          <AddWordDialog onAdd={createMutation.mutate} />
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
