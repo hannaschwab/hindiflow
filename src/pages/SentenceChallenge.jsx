@@ -73,7 +73,7 @@ export default function SentenceChallenge() {
     // Send opening message
     await base44.agents.addMessage(conv, {
       role: "user",
-      content: "Hi! I'm ready for a sentence challenge.",
+      content: "Hi! I'm ready to practice. Please explain both modes briefly and ask me which I prefer.",
     });
 
     setStarting(false);
@@ -105,15 +105,47 @@ export default function SentenceChallenge() {
   return (
     <div className="flex flex-col h-screen md:h-[calc(100vh-0px)] max-w-2xl mx-auto p-4 md:p-8 pb-24 md:pb-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-primary" /> Sentence Challenge
+            <Sparkles className="w-6 h-6 text-primary" /> Sentence Builder
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">Build sentences with your Hindi vocabulary</p>
+          <p className="text-sm text-muted-foreground mt-1">Practice Hindi with your vocabulary</p>
         </div>
         <Button variant="outline" size="sm" className="gap-2" onClick={handleNewChallenge}>
-          <Plus className="w-4 h-4" /> New Challenge
+          <Plus className="w-4 h-4" /> New Session
+        </Button>
+      </div>
+
+      {/* Quick mode shortcuts */}
+      <div className="flex gap-2 mb-4">
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs gap-1.5"
+          disabled={loading || starting}
+          onClick={async () => {
+            if (!conversation) return;
+            setLoading(true);
+            await base44.agents.addMessage(conversation, { role: "user", content: "Give me a Free Build challenge." });
+            setLoading(false);
+          }}
+        >
+          ✏️ Free Build
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs gap-1.5"
+          disabled={loading || starting}
+          onClick={async () => {
+            if (!conversation) return;
+            setLoading(true);
+            await base44.agents.addMessage(conversation, { role: "user", content: "Give me a Translation challenge." });
+            setLoading(false);
+          }}
+        >
+          🔄 Translation
         </Button>
       </div>
 

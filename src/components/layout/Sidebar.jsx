@@ -5,7 +5,7 @@ const navItems = [
   { path: "/", label: "Dashboard", icon: BarChart3 },
   { path: "/words", label: "Word List", icon: List },
   { path: "/practice", label: "Practice", icon: GraduationCap },
-  { path: "/challenge", label: "Sentence Challenge", icon: Sparkles },
+  { path: "/challenge", label: "Sentence Builder", icon: Sparkles },
   { path: "/import", label: "Import Words", icon: Upload },
 ];
 
