@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Pencil } from "lucide-react";
 import SpeakButton from "@/components/common/SpeakButton";
 import EditWordDialog from "@/components/words/EditWordDialog";
+import CategoryBadge from "@/components/words/CategoryBadge";
 
 function getMasteryLabel(mastery) {
   if (mastery >= 80) return { label: "Mastered", className: "bg-accent/15 text-accent border-accent/20" };
@@ -29,11 +30,7 @@ export default function WordRow({ word, onDelete, onEdit }) {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {word.category && word.category !== "other" && (
-            <Badge variant="outline" className="text-xs hidden sm:inline-flex capitalize">
-              {word.category}
-            </Badge>
-          )}
+          <CategoryBadge word={word} onEdit={onEdit} />
           <Badge variant="outline" className={`text-xs ${className}`}>{label}</Badge>
           <Button
             variant="ghost"
