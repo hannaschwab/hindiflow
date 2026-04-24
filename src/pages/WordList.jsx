@@ -107,6 +107,20 @@ export default function WordList() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] }),
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.Vocabulary.update(id, data),
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ["vocabulary"] });
+      const previous = queryClient.getQueryData(["vocabulary"]);
+      queryClient.setQueryData(["vocabulary"], (old = []) => old.map(w => w.id === id ? { ...w, ...data } : w));
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(["vocabulary"], context.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] }),
+  });
+
   const filtered = words.filter(w => {
     const matchSearch = !search || 
       w.hindi?.toLowerCase().includes(search.toLowerCase()) ||
@@ -155,7 +169,7 @@ export default function WordList() {
           </div>
         ) : (
           filtered.map(word => (
-            <WordRow key={word.id} word={word} onDelete={deleteMutation.mutate} />
+            <WordRow key={word.id} word={word} onDelete={deleteMutation.mutate} onEdit={(id, data) => updateMutation.mutate({ id, data })} />
           ))
         )}
       </div>
