@@ -1,10 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { BookOpen, GraduationCap, List, Upload, BarChart3 } from "lucide-react";
+import { BookOpen, GraduationCap, List, Upload, BarChart3, Sparkles } from "lucide-react";
 
 const navItems = [
   { path: "/", label: "Dashboard", icon: BarChart3 },
   { path: "/words", label: "Word List", icon: List },
   { path: "/practice", label: "Practice", icon: GraduationCap },
+  { path: "/challenge", label: "Sentence Challenge", icon: Sparkles },
   { path: "/import", label: "Import Words", icon: Upload },
 ];
 

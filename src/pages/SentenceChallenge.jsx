@@ -1,0 +1,174 @@
+import { useState, useEffect, useRef } from "react";
+import { base44 } from "@/api/base44Client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Send, Sparkles, Plus } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+
+function MessageBubble({ message }) {
+  const isUser = message.role === "user";
+  if (message.role === "tool" || !message.content) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}
+    >
+      {!isUser && (
+        <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shrink-0 mt-0.5">
+          <Sparkles className="w-4 h-4 text-primary-foreground" />
+        </div>
+      )}
+      <div
+        className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+          isUser
+            ? "bg-primary text-primary-foreground"
+            : "bg-card border border-border text-foreground"
+        }`}
+      >
+        {isUser ? (
+          message.content
+        ) : (
+          <ReactMarkdown
+            className="prose prose-sm max-w-none prose-p:my-1 prose-strong:text-foreground"
+          >
+            {message.content}
+          </ReactMarkdown>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+export default function SentenceChallenge() {
+  const [conversation, setConversation] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [starting, setStarting] = useState(true);
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    startConversation();
+  }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const startConversation = async () => {
+    setStarting(true);
+    const conv = await base44.agents.createConversation({
+      agent_name: "sentence_challenge",
+      metadata: { name: "Sentence Challenge" },
+    });
+    setConversation(conv);
+
+    const unsubscribe = base44.agents.subscribeToConversation(conv.id, (data) => {
+      setMessages(data.messages || []);
+    });
+
+    // Send opening message
+    await base44.agents.addMessage(conv, {
+      role: "user",
+      content: "Hi! I'm ready for a sentence challenge.",
+    });
+
+    setStarting(false);
+    return () => unsubscribe();
+  };
+
+  const handleSend = async () => {
+    if (!input.trim() || loading || !conversation) return;
+    const text = input.trim();
+    setInput("");
+    setLoading(true);
+    await base44.agents.addMessage(conversation, { role: "user", content: text });
+    setLoading(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const handleNewChallenge = async () => {
+    setMessages([]);
+    setConversation(null);
+    await startConversation();
+  };
+
+  return (
+    <div className="flex flex-col h-screen md:h-[calc(100vh-0px)] max-w-2xl mx-auto p-4 md:p-8 pb-24 md:pb-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <Sparkles className="w-6 h-6 text-primary" /> Sentence Challenge
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">Build sentences with your Hindi vocabulary</p>
+        </div>
+        <Button variant="outline" size="sm" className="gap-2" onClick={handleNewChallenge}>
+          <Plus className="w-4 h-4" /> New Challenge
+        </Button>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+        {starting && (
+          <div className="flex gap-3 justify-start">
+            <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shrink-0">
+              <Sparkles className="w-4 h-4 text-primary-foreground" />
+            </div>
+            <div className="bg-card border border-border rounded-2xl px-4 py-3">
+              <div className="flex gap-1.5 items-center h-5">
+                <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+              </div>
+            </div>
+          </div>
+        )}
+        <AnimatePresence>
+          {messages.map((msg, i) => (
+            <MessageBubble key={i} message={msg} />
+          ))}
+        </AnimatePresence>
+        {loading && (
+          <div className="flex gap-3 justify-start">
+            <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shrink-0">
+              <Sparkles className="w-4 h-4 text-primary-foreground" />
+            </div>
+            <div className="bg-card border border-border rounded-2xl px-4 py-3">
+              <div className="flex gap-1.5 items-center h-5">
+                <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Input */}
+      <div className="mt-4 flex gap-2">
+        <Input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Type your sentence..."
+          disabled={loading || starting}
+          className="flex-1 rounded-xl"
+        />
+        <Button onClick={handleSend} disabled={loading || starting || !input.trim()} size="icon" className="rounded-xl shrink-0">
+          <Send className="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}

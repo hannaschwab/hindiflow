@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import WordList from './pages/WordList';
 import Practice from './pages/Practice';
 import ImportWords from './pages/ImportWords';
+import SentenceChallenge from './pages/SentenceChallenge';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -42,6 +43,7 @@ const AuthenticatedApp = () => {
         <Route path="/words" element={<WordList />} />
         <Route path="/practice" element={<Practice />} />
         <Route path="/import" element={<ImportWords />} />
+        <Route path="/challenge" element={<SentenceChallenge />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
