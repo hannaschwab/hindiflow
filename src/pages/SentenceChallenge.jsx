@@ -2,33 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Sparkles, Plus, Volume2 } from "lucide-react";
+import { Send, Sparkles, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import TutorAvatar from "@/components/sentence/TutorAvatar";
 
-function speakHindi(text) {
-  // Extract Hindi/transliteration phrases from markdown (bold or quoted text)
-  window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = "hi-IN";
-  utter.rate = 0.85;
-  window.speechSynthesis.speak(utter);
-}
-
-function extractSpeakableHindi(content) {
-  // Pull out bold text (likely Hindi words/phrases presented to the user)
-  const boldMatches = [...content.matchAll(/\*\*([^*]+)\*\*/g)].map(m => m[1]);
-  // Pull out quoted text
-  const quoteMatches = [...content.matchAll(/"([^"]+)"/g)].map(m => m[1]);
-  return [...boldMatches, ...quoteMatches].filter(Boolean);
-}
-
 function MessageBubble({ message }) {
   const isUser = message.role === "user";
   if (message.role === "tool" || !message.content) return null;
-
-  const speakableItems = !isUser ? extractSpeakableHindi(message.content) : [];
 
   return (
     <motion.div
@@ -51,27 +32,11 @@ function MessageBubble({ message }) {
         {isUser ? (
           message.content
         ) : (
-          <>
-            <ReactMarkdown
-              className="prose prose-sm max-w-none prose-p:my-1 prose-strong:text-foreground"
-            >
-              {message.content}
-            </ReactMarkdown>
-            {speakableItems.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-border/50">
-                {speakableItems.map((phrase, i) => (
-                  <button
-                    key={i}
-                    onClick={() => speakHindi(phrase)}
-                    className="flex items-center gap-1 text-xs px-2 py-1 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                  >
-                    <Volume2 className="w-3 h-3" />
-                    {phrase}
-                  </button>
-                ))}
-              </div>
-            )}
-          </>
+          <ReactMarkdown
+            className="prose prose-sm max-w-none prose-p:my-1 prose-strong:text-foreground"
+          >
+            {message.content}
+          </ReactMarkdown>
         )}
       </div>
     </motion.div>
