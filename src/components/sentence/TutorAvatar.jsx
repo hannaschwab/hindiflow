@@ -5,6 +5,7 @@ const AVATAR = {
   thinking: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/179cb1553_generated_image.png",
   celebrating: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/1317fc47a_generated_image.png",
   encouraging: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/fbcae4283_generated_image.png",
+  motivating: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/d334ef690_generated_image.png",
 };
 
 const STATE_CONFIG = {
@@ -12,6 +13,7 @@ const STATE_CONFIG = {
   thinking: { label: "Thinking...", color: "bg-yellow-400" },
   celebrating: { label: "Great job!", color: "bg-green-500" },
   encouraging: { label: "Keep trying!", color: "bg-orange-400" },
+  motivating: { label: "You can do it!", color: "bg-blue-400" },
 };
 
 export default function TutorAvatar({ state = "idle" }) {

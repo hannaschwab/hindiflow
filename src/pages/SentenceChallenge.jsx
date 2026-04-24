@@ -63,15 +63,22 @@ export default function SentenceChallenge() {
       const lastMsg = messages[messages.length - 1];
       if (lastMsg?.role === "assistant" && lastMsg?.content) {
         const lower = lastMsg.content.toLowerCase();
-        const celebrationWords = ["great", "excellent", "perfect", "well done", "correct", "amazing", "fantastic", "bravo", "shabash"];
-        const encourageWords = ["not quite", "almost", "close", "try again", "incorrect", "mistake", "actually", "should be", "let me correct"];
-        const isCelebrating = celebrationWords.some(w => lower.includes(w));
-        const isEncouraging = !isCelebrating && encourageWords.some(w => lower.includes(w));
-        if (isCelebrating && !loading) {
+        // Strong correct signals — only celebrate if clearly fully correct
+        const strongCorrectWords = ["excellent", "perfect", "well done", "amazing", "fantastic", "bravo", "shabash", "spot on", "100%", "exactly right"];
+        // Partial/weak correct signals — motivate instead of celebrate
+        const weakCorrectWords = ["great", "correct", "good job", "nice"];
+        const wrongWords = ["not quite", "almost", "close", "try again", "incorrect", "mistake", "actually", "should be", "let me correct", "wrong", "not right", "not correct"];
+        const isStrongCorrect = strongCorrectWords.some(w => lower.includes(w));
+        const isWrongAnswer = wrongWords.some(w => lower.includes(w));
+        const isWeakCorrect = !isStrongCorrect && !isWrongAnswer && weakCorrectWords.some(w => lower.includes(w));
+        if (isStrongCorrect && !loading) {
           setAvatarState("celebrating");
           setTimeout(() => setAvatarState("idle"), 3000);
-        } else if (isEncouraging && !loading) {
+        } else if (isWeakCorrect && !loading) {
           setAvatarState("encouraging");
+          setTimeout(() => setAvatarState("idle"), 3000);
+        } else if (isWrongAnswer && !loading) {
+          setAvatarState("motivating");
           setTimeout(() => setAvatarState("idle"), 3000);
         }
       }
