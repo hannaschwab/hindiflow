@@ -1,11 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 
 const AVATAR = {
-  idle: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/888a524e1_generated_image.png",
-  thinking: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/179cb1553_generated_image.png",
-  celebrating: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/1317fc47a_generated_image.png",
-  encouraging: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/fbcae4283_generated_image.png",
-  motivating: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/d334ef690_generated_image.png",
+  idle: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/66cd50c49_generated_image.png",
+  thinking: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/eb3f816d0_generated_image.png",
+  celebrating: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/08e47aae2_generated_image.png",
+  encouraging: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/0019a5b21_generated_image.png",
+  motivating: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/17de253a4_generated_image.png",
 };
 
 const STATE_CONFIG = {
