@@ -114,6 +114,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const deleteAccount = async () => {
+    // Mock deletion: logs out the user. Replace with real API call when available.
+    await base44.auth.logout();
+  };
+
   const logout = (shouldRedirect = true) => {
     setUser(null);
     setIsAuthenticated(false);
@@ -142,6 +147,7 @@ export const AuthProvider = ({ children }) => {
       appPublicSettings,
       authChecked,
       logout,
+      deleteAccount,
       navigateToLogin,
       checkUserAuth,
       checkAppState

@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from "framer-motion";
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -11,6 +12,40 @@ import WordList from './pages/WordList';
 import Practice from './pages/Practice';
 import ImportWords from './pages/ImportWords';
 import SentenceChallenge from './pages/SentenceChallenge';
+
+const pageVariants = {
+  initial: { opacity: 0, x: 20 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -20 },
+};
+
+const AnimatedOutlet = () => {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        variants={pageVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.18, ease: "easeInOut" }}
+        className="h-full"
+      >
+        <Routes location={location}>
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/words" element={<WordList />} />
+            <Route path="/practice" element={<Practice />} />
+            <Route path="/import" element={<ImportWords />} />
+            <Route path="/challenge" element={<SentenceChallenge />} />
+          </Route>
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -36,18 +71,7 @@ const AuthenticatedApp = () => {
   }
 
   // Render the main app
-  return (
-    <Routes>
-      <Route element={<AppLayout />}>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/words" element={<WordList />} />
-        <Route path="/practice" element={<Practice />} />
-        <Route path="/import" element={<ImportWords />} />
-        <Route path="/challenge" element={<SentenceChallenge />} />
-      </Route>
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
-  );
+  return <AnimatedOutlet />;
 };
 
 

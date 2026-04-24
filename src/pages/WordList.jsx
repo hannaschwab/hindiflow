@@ -21,12 +21,30 @@ export default function WordList() {
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Vocabulary.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] }),
+    onMutate: async (data) => {
+      await queryClient.cancelQueries({ queryKey: ["vocabulary"] });
+      const previous = queryClient.getQueryData(["vocabulary"]);
+      queryClient.setQueryData(["vocabulary"], (old = []) => [{ ...data, id: `temp-${Date.now()}` }, ...old]);
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(["vocabulary"], context.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] }),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Vocabulary.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] }),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["vocabulary"] });
+      const previous = queryClient.getQueryData(["vocabulary"]);
+      queryClient.setQueryData(["vocabulary"], (old = []) => old.filter(w => w.id !== id));
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(["vocabulary"], context.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] }),
   });
 
   const filtered = words.filter(w => {

@@ -24,7 +24,18 @@ export default function Practice() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Vocabulary.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] }),
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ["vocabulary"] });
+      const previous = queryClient.getQueryData(["vocabulary"]);
+      queryClient.setQueryData(["vocabulary"], (old = []) =>
+        old.map(w => w.id === id ? { ...w, ...data } : w)
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(["vocabulary"], context.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] }),
   });
 
   const startPractice = useCallback((mode) => {
