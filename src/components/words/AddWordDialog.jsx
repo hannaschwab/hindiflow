@@ -4,16 +4,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 const CATEGORIES = ["greetings", "food", "travel", "numbers", "family", "colors", "verbs", "adjectives", "phrases", "other"];
 
 export default function AddWordDialog({ onAdd }) {
   const [open, setOpen] = useState(false);
+  const [categorizing, setCategorizing] = useState(false);
   const [form, setForm] = useState({
     hindi: "", transliteration: "", english: "",
     example_hindi: "", example_english: "", category: "other"
   });
+
+  const autoCategrize = async (hindi, english) => {
+    if (!hindi || !english) return;
+    setCategorizing(true);
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt: `Categorize the Hindi word "${hindi}" (meaning: "${english}") into exactly one of these categories: greetings, food, travel, numbers, family, colors, verbs, adjectives, phrases, other. Reply with only the category name, nothing else.`,
+      response_json_schema: { type: "object", properties: { category: { type: "string" } } }
+    });
+    const category = CATEGORIES.includes(result?.category) ? result.category : "other";
+    setForm(f => ({ ...f, category }));
+    setCategorizing(false);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -44,7 +58,9 @@ export default function AddWordDialog({ onAdd }) {
             <div>
               <Label htmlFor="english">English *</Label>
               <Input id="english" placeholder="Hello"
-                value={form.english} onChange={e => setForm({...form, english: e.target.value})} />
+                value={form.english}
+                onChange={e => setForm({...form, english: e.target.value})}
+                onBlur={() => autoCategrize(form.hindi, form.english)} />
             </div>
           </div>
           <div>
@@ -65,8 +81,11 @@ export default function AddWordDialog({ onAdd }) {
             </div>
           </div>
           <div>
-            <Label>Category</Label>
-            <Select value={form.category} onValueChange={v => setForm({...form, category: v})}>
+            <Label className="flex items-center gap-2">
+              Category
+              {categorizing && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
+            </Label>
+            <Select value={form.category} onValueChange={v => setForm({...form, category: v})} disabled={categorizing}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {CATEGORIES.map(c => (
