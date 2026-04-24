@@ -29,10 +29,21 @@ export default function AddWordDialog({ onAdd }) {
     setCategorizing(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.hindi || !form.english) return;
-    onAdd(form);
+    let finalForm = form;
+    if (form.category === "other" && form.hindi && form.english) {
+      setCategorizing(true);
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Categorize the Hindi word "${form.hindi}" (meaning: "${form.english}") into exactly one of these categories: greetings, food, travel, numbers, family, colors, verbs, adjectives, phrases, other. Reply with only the category name, nothing else.`,
+        response_json_schema: { type: "object", properties: { category: { type: "string" } } }
+      });
+      const category = allCategories.includes(result?.category) ? result.category : "other";
+      finalForm = { ...form, category };
+      setCategorizing(false);
+    }
+    onAdd(finalForm);
     setForm({ hindi: "", transliteration: "", english: "", example_hindi: "", example_english: "", category: "other" });
     setOpen(false);
   };
@@ -53,7 +64,8 @@ export default function AddWordDialog({ onAdd }) {
             <div>
               <Label htmlFor="hindi">Hindi *</Label>
               <Input id="hindi" placeholder="namaste"
-                value={form.hindi} onChange={e => setForm({...form, hindi: e.target.value})} />
+                value={form.hindi} onChange={e => setForm({...form, hindi: e.target.value})}
+                onBlur={() => autoCategrize(form.hindi, form.english)} />
             </div>
             <div>
               <Label htmlFor="english">English *</Label>
