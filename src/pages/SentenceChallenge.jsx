@@ -62,10 +62,16 @@ export default function SentenceChallenge() {
     if (messages.length > 0) {
       const lastMsg = messages[messages.length - 1];
       if (lastMsg?.role === "assistant" && lastMsg?.content) {
+        const lower = lastMsg.content.toLowerCase();
         const celebrationWords = ["great", "excellent", "perfect", "well done", "correct", "amazing", "fantastic", "bravo", "shabash"];
-        const isCelebrating = celebrationWords.some(w => lastMsg.content.toLowerCase().includes(w));
+        const encourageWords = ["not quite", "almost", "close", "try again", "incorrect", "mistake", "actually", "should be", "let me correct"];
+        const isCelebrating = celebrationWords.some(w => lower.includes(w));
+        const isEncouraging = !isCelebrating && encourageWords.some(w => lower.includes(w));
         if (isCelebrating && !loading) {
           setAvatarState("celebrating");
+          setTimeout(() => setAvatarState("idle"), 3000);
+        } else if (isEncouraging && !loading) {
+          setAvatarState("encouraging");
           setTimeout(() => setAvatarState("idle"), 3000);
         }
       }
