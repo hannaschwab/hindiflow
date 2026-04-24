@@ -1,9 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 
 const AVATAR = {
-  idle: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/e2900aa94_generated_image.png",
-  thinking: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/353d2fb71_generated_image.png",
-  celebrating: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/de2a6a93c_generated_image.png",
+  idle: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/fed6d36f4_generated_image.png",
+  thinking: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/1aedbb717_generated_image.png",
+  celebrating: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/9341be1ce_generated_image.png",
 };
 
 const STATE_CONFIG = {
@@ -40,7 +40,7 @@ export default function TutorAvatar({ state = "idle" }) {
             key={state}
             src={AVATAR[state] || AVATAR.idle}
             alt="Hindi tutor avatar"
-            className="w-full h-full object-cover object-top rounded-full border-4 border-primary/20 shadow-lg bg-secondary"
+            className="w-full h-full object-cover object-center rounded-full border-4 border-primary/20 shadow-lg bg-secondary"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
