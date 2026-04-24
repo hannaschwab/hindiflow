@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Send, Sparkles, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import TutorAvatar from "@/components/sentence/TutorAvatar";
 
 function MessageBubble({ message }) {
   const isUser = message.role === "user";
@@ -48,6 +49,7 @@ export default function SentenceChallenge() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [starting, setStarting] = useState(true);
+  const [avatarState, setAvatarState] = useState("idle");
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -56,10 +58,23 @@ export default function SentenceChallenge() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Detect celebratory responses from the agent
+    if (messages.length > 0) {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg?.role === "assistant" && lastMsg?.content) {
+        const celebrationWords = ["great", "excellent", "perfect", "well done", "correct", "amazing", "fantastic", "bravo", "shabash"];
+        const isCelebrating = celebrationWords.some(w => lastMsg.content.toLowerCase().includes(w));
+        if (isCelebrating && !loading) {
+          setAvatarState("celebrating");
+          setTimeout(() => setAvatarState("idle"), 3000);
+        }
+      }
+    }
   }, [messages]);
 
   const startConversation = async () => {
     setStarting(true);
+    setAvatarState("thinking");
     const conv = await base44.agents.createConversation({
       agent_name: "sentence_challenge",
       metadata: { name: "Sentence Challenge" },
@@ -77,6 +92,7 @@ export default function SentenceChallenge() {
     });
 
     setStarting(false);
+    setAvatarState("idle");
     return () => unsubscribe();
   };
 
@@ -85,8 +101,10 @@ export default function SentenceChallenge() {
     const text = input.trim();
     setInput("");
     setLoading(true);
+    setAvatarState("thinking");
     await base44.agents.addMessage(conversation, { role: "user", content: text });
     setLoading(false);
+    setAvatarState("idle");
   };
 
   const handleKeyDown = (e) => {
@@ -115,6 +133,11 @@ export default function SentenceChallenge() {
         <Button variant="outline" size="sm" className="gap-2" onClick={handleNewChallenge}>
           <Plus className="w-4 h-4" /> New Session
         </Button>
+      </div>
+
+      {/* Avatar */}
+      <div className="flex justify-center mb-2">
+        <TutorAvatar state={avatarState} />
       </div>
 
       {/* Quick mode shortcuts */}
