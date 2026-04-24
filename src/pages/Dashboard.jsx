@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import StatCard from "@/components/dashboard/StatCard";
 import MasteryChart from "@/components/dashboard/MasteryChart";
 import RecentWords from "@/components/dashboard/RecentWords";
+import DailyGoal from "@/components/dashboard/DailyGoal";
 
 export default function Dashboard() {
   const { data: words = [], isLoading } = useQuery({
@@ -47,6 +48,10 @@ export default function Dashboard() {
         <StatCard title="Mastered" value={mastered} subtitle={totalWords > 0 ? `${Math.round(mastered / totalWords * 100)}%` : "—"} icon={Target} color="bg-accent/10 text-accent" />
         <StatCard title="Practiced" value={practiced} icon={Flame} color="bg-chart-5/10 text-chart-5" />
         <StatCard title="Avg Mastery" value={`${avgMastery}%`} icon={TrendingUp} color="bg-chart-4/10 text-chart-4" />
+      </div>
+
+      <div className="mb-6">
+        <DailyGoal words={words} />
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">

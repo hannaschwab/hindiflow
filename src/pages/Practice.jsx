@@ -3,9 +3,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, Shuffle, ArrowRight } from "lucide-react";
+import { Check, X, Shuffle, ArrowRight, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Flashcard from "@/components/practice/Flashcard";
+import { computeSRS, getDueWords, countPracticedToday, todayStr } from "@/lib/srs";
+
+const DAILY_GOAL = 5;
 
 export default function Practice() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -29,6 +32,9 @@ export default function Practice() {
     if (mode === "weak") {
       selectedWords = selectedWords.filter(w => (w.mastery || 0) < 50);
       if (selectedWords.length === 0) selectedWords = [...words];
+    } else if (mode === "srs") {
+      selectedWords = getDueWords(words);
+      if (selectedWords.length === 0) selectedWords = [...words];
     }
     // Shuffle
     for (let i = selectedWords.length - 1; i > 0; i--) {
@@ -47,6 +53,8 @@ export default function Practice() {
     const newCorrect = (word.times_correct || 0) + (correct ? 1 : 0);
     const newMastery = Math.round((newCorrect / newPracticed) * 100);
 
+    const srsFields = computeSRS(word, correct);
+
     updateMutation.mutate({
       id: word.id,
       data: {
@@ -54,6 +62,8 @@ export default function Practice() {
         times_correct: newCorrect,
         mastery: newMastery,
         last_practiced: new Date().toISOString(),
+        last_practiced_date: todayStr(),
+        ...srsFields,
       }
     });
 
@@ -123,14 +133,61 @@ export default function Practice() {
   // No active session - show mode selection
   if (!deck) {
     const weakCount = words.filter(w => (w.mastery || 0) < 50).length;
+    const dueCount = getDueWords(words).length;
+    const practicedToday = countPracticedToday(words);
+    const goalDone = practicedToday >= DAILY_GOAL;
+
     return (
       <div className="p-6 md:p-10 max-w-2xl mx-auto">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground">Practice</h1>
           <p className="text-sm text-muted-foreground mt-1">Choose your practice mode</p>
         </div>
 
+        {/* Daily goal bar */}
+        <div className={`rounded-2xl p-4 border mb-6 ${goalDone ? "bg-accent/10 border-accent/30" : "bg-card border-border"}`}>
+          <div className="flex justify-between text-sm mb-2">
+            <span className="font-medium text-foreground">Daily Goal</span>
+            <span className={goalDone ? "text-accent font-semibold" : "text-muted-foreground"}>
+              {practicedToday} / {DAILY_GOAL} words {goalDone ? "🎉" : ""}
+            </span>
+          </div>
+          <div className="w-full h-2.5 bg-secondary rounded-full overflow-hidden">
+            <motion.div
+              className={`h-full rounded-full ${goalDone ? "bg-accent" : "bg-primary"}`}
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min(practicedToday / DAILY_GOAL, 1) * 100}%` }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            />
+          </div>
+        </div>
+
         <div className="grid gap-4">
+          {/* SRS mode - highlighted if words are due */}
+          <motion.button
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            onClick={() => startPractice("srs")}
+            className={`rounded-2xl border shadow-sm p-6 text-left transition-colors ${
+              dueCount > 0
+                ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
+                : "bg-card border-border hover:border-primary/50"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Clock className="w-4 h-4" />
+                  <h3 className="font-semibold text-lg">Due for Review</h3>
+                </div>
+                <p className={`text-sm mt-1 ${dueCount > 0 ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                  {dueCount > 0 ? `${dueCount} words scheduled for today (spaced repetition)` : "No words due right now — check back later!"}
+                </p>
+              </div>
+              <ArrowRight className="w-5 h-5 opacity-70" />
+            </div>
+          </motion.button>
+
           <motion.button
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
@@ -154,9 +211,9 @@ export default function Practice() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-foreground text-lg">Focus on Weak Words</h3>
+                <h3 className="font-semibold text-foreground text-lg">Weak Words</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Practice words you haven't mastered yet ({weakCount} words)
+                  Focus on words you haven't mastered yet ({weakCount} words)
                 </p>
               </div>
               <ArrowRight className="w-5 h-5 text-muted-foreground" />

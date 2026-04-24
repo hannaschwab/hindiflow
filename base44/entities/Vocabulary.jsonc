@@ -58,6 +58,30 @@
       "type": "string",
       "format": "date-time",
       "description": "Last practice timestamp"
+    },
+    "next_review": {
+      "type": "string",
+      "format": "date-time",
+      "description": "SRS: next scheduled review date"
+    },
+    "srs_interval": {
+      "type": "number",
+      "default": 1,
+      "description": "SRS: current interval in days"
+    },
+    "srs_ease": {
+      "type": "number",
+      "default": 2.5,
+      "description": "SRS: ease factor (SM-2)"
+    },
+    "practiced_today": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this word was practiced today (for daily goal tracking)"
+    },
+    "last_practiced_date": {
+      "type": "string",
+      "description": "Date string YYYY-MM-DD of last practice (for daily goal)"
     }
   },
   "required": [
