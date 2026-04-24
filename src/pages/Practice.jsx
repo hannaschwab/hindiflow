@@ -126,7 +126,7 @@ export default function Practice() {
     return (
       <div className="p-6 md:p-10 max-w-2xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground">अभ्यास</h1>
+          <h1 className="text-2xl font-bold text-foreground">Practice</h1>
           <p className="text-sm text-muted-foreground mt-1">Choose your practice mode</p>
         </div>
 

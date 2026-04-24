@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import SpeakButton from "@/components/common/SpeakButton";
 
 function getMasteryLabel(mastery) {
   if (mastery >= 80) return { label: "Mastered", className: "bg-accent/15 text-accent border-accent/20" };
@@ -17,10 +18,8 @@ export default function WordRow({ word, onDelete }) {
       <div className="flex items-center gap-4 min-w-0 flex-1">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-devanagari text-lg font-semibold text-foreground">{word.hindi}</span>
-            {word.transliteration && (
-              <span className="text-xs text-muted-foreground italic hidden sm:inline">({word.transliteration})</span>
-            )}
+            <span className="text-base font-semibold text-foreground">{word.transliteration || word.hindi}</span>
+            <SpeakButton text={word.hindi} lang="hi-IN" className="h-7 w-7" />
           </div>
           <p className="text-sm text-muted-foreground truncate">{word.english}</p>
         </div>

@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RotateCcw } from "lucide-react";
+import SpeakButton from "@/components/common/SpeakButton";
 
 export default function Flashcard({ word, showAnswer, onFlip }) {
   return (
@@ -20,10 +20,10 @@ export default function Flashcard({ word, showAnswer, onFlip }) {
           {!showAnswer ? (
             <>
               <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Hindi</p>
-              <p className="font-devanagari text-5xl font-bold text-foreground mb-3">{word.hindi}</p>
-              {word.transliteration && (
-                <p className="text-base text-muted-foreground italic">{word.transliteration}</p>
-              )}
+              <p className="text-4xl font-bold text-foreground mb-2">{word.transliteration || word.hindi}</p>
+              <div className="flex items-center justify-center gap-2 mt-1">
+                <SpeakButton text={word.hindi} lang="hi-IN" />
+              </div>
               <p className="text-xs text-muted-foreground mt-6 flex items-center gap-1">
                 <RotateCcw className="w-3 h-3" /> Tap to reveal
               </p>
@@ -32,12 +32,9 @@ export default function Flashcard({ word, showAnswer, onFlip }) {
             <>
               <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">English</p>
               <p className="text-3xl font-bold text-foreground mb-3">{word.english}</p>
-              {word.example_hindi && (
+              {word.example_english && (
                 <div className="mt-4 p-3 bg-secondary/50 rounded-xl">
-                  <p className="font-devanagari text-sm text-foreground">{word.example_hindi}</p>
-                  {word.example_english && (
-                    <p className="text-xs text-muted-foreground mt-1 italic">{word.example_english}</p>
-                  )}
+                  <p className="text-sm text-foreground italic">{word.example_english}</p>
                 </div>
               )}
               <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1">

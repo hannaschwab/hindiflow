@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import SpeakButton from "@/components/common/SpeakButton";
 
 export default function RecentWords({ words }) {
   const recent = [...words]
@@ -27,11 +28,9 @@ export default function RecentWords({ words }) {
               transition={{ delay: i * 0.05 }}
               className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-secondary/50 transition-colors"
             >
-              <div className="flex items-center gap-3">
-                <span className="font-devanagari text-lg font-semibold text-foreground">{word.hindi}</span>
-                {word.transliteration && (
-                  <span className="text-xs text-muted-foreground italic">{word.transliteration}</span>
-                )}
+              <div className="flex items-center gap-2">
+                <span className="text-base font-semibold text-foreground">{word.transliteration || word.hindi}</span>
+                <SpeakButton text={word.hindi} lang="hi-IN" className="h-7 w-7" />
               </div>
               <span className="text-sm text-muted-foreground">{word.english}</span>
             </motion.div>

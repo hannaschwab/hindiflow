@@ -118,7 +118,7 @@ Return ALL vocabulary items you can find. Be thorough. If transliterations or ex
   return (
     <div className="p-6 md:p-10 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground">आयात करें</h1>
+        <h1 className="text-2xl font-bold text-foreground">Import Words</h1>
         <p className="text-sm text-muted-foreground mt-1">Import vocabulary from your Google Doc or any text</p>
       </div>
 

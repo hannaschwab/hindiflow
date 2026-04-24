@@ -50,7 +50,7 @@ export default function WordList() {
     <div className="p-6 md:p-10 max-w-4xl mx-auto">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">शब्द सूची</h1>
+          <h1 className="text-2xl font-bold text-foreground">Word List</h1>
           <p className="text-sm text-muted-foreground mt-1">{words.length} words in your collection</p>
         </div>
         <AddWordDialog onAdd={createMutation.mutate} />

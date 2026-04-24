@@ -38,7 +38,7 @@ export default function AddWordDialog({ onAdd }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label htmlFor="hindi">Hindi *</Label>
-              <Input id="hindi" placeholder="नमस्ते" className="font-devanagari"
+              <Input id="hindi" placeholder="namaste"
                 value={form.hindi} onChange={e => setForm({...form, hindi: e.target.value})} />
             </div>
             <div>
@@ -55,7 +55,7 @@ export default function AddWordDialog({ onAdd }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label htmlFor="exHindi">Example (Hindi)</Label>
-              <Input id="exHindi" className="font-devanagari" placeholder="नमस्ते, आप कैसे हैं?"
+              <Input id="exHindi" placeholder="Namaste, aap kaise hain?"
                 value={form.example_hindi} onChange={e => setForm({...form, example_hindi: e.target.value})} />
             </div>
             <div>
