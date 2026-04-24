@@ -37,18 +37,20 @@ export default function TutorAvatar({ state = "idle" }) {
           />
         )}
 
+        <div className="absolute inset-0 rounded-full overflow-hidden border-4 border-primary/20 shadow-lg bg-secondary">
         <AnimatePresence mode="wait">
           <motion.img
             key={state}
             src={AVATAR[state] || AVATAR.idle}
             alt="Hindi tutor avatar"
-            className="w-full h-full object-cover object-center rounded-full border-4 border-primary/20 shadow-lg bg-secondary"
+            className="w-full h-full object-cover object-center"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1.15 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.3 }}
           />
         </AnimatePresence>
+        </div>
       </div>
 
       {/* Status badge */}
