@@ -1,9 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 
 const AVATAR = {
-  idle: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/fed6d36f4_generated_image.png",
-  thinking: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/1aedbb717_generated_image.png",
-  celebrating: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/9341be1ce_generated_image.png",
+  idle: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/888a524e1_generated_image.png",
+  thinking: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/179cb1553_generated_image.png",
+  celebrating: "https://media.base44.com/images/public/69eb2d3796574eaf6d30369d/1317fc47a_generated_image.png",
 };
 
 const STATE_CONFIG = {
