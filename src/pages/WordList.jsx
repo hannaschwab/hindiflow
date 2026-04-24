@@ -1,14 +1,72 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search } from "lucide-react";
+import { Search, ChevronDown } from "lucide-react";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import WordRow from "@/components/words/WordRow";
 import AddWordDialog from "@/components/words/AddWordDialog";
 import PullToRefreshWrapper from "@/components/common/PullToRefreshWrapper";
 
 const CATEGORIES = ["all", "greetings", "food", "travel", "numbers", "family", "colors", "verbs", "adjectives", "phrases", "other"];
+
+function CategorySelect({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const isMobile = window.innerWidth < 768;
+  const label = value === "all" ? "All Categories" : value.replace(/_/g, " ");
+
+  const trigger = (
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      className="flex h-9 w-40 items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm capitalize shrink-0"
+    >
+      {label}
+      <ChevronDown className="w-4 h-4 opacity-50" />
+    </button>
+  );
+
+  const items = (
+    <div className="p-2 space-y-1">
+      {CATEGORIES.map(c => (
+        <button
+          key={c}
+          type="button"
+          onClick={() => { onChange(c); setOpen(false); }}
+          className={`w-full text-left px-3 py-2 rounded-lg text-sm capitalize transition-colors ${value === c ? "bg-primary text-primary-foreground" : "hover:bg-secondary"}`}
+        >
+          {c === "all" ? "All Categories" : c.replace(/_/g, " ")}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={setOpen}>
+        <div onClick={() => setOpen(true)}>{trigger}</div>
+        <DrawerContent>
+          <DrawerHeader><DrawerTitle>Filter by Category</DrawerTitle></DrawerHeader>
+          <div className="pb-6">{items}</div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  return (
+    <div className="relative">
+      {trigger}
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 z-50 mt-1 w-48 bg-popover border border-border rounded-lg shadow-lg">
+            {items}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function WordList() {
   const [search, setSearch] = useState("");
@@ -87,16 +145,7 @@ export default function WordList() {
             className="pl-10"
           />
         </div>
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {CATEGORIES.map(c => (
-              <SelectItem key={c} value={c} className="capitalize">{c === "all" ? "All Categories" : c.replace(/_/g, " ")}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <CategorySelect value={category} onChange={setCategory} />
       </div>
 
       <div className="bg-card rounded-2xl border border-border shadow-sm divide-y divide-border">

@@ -89,6 +89,15 @@
     @apply bg-background text-foreground;
     overscroll-behavior: none;
   }
+  button, a, nav, [role="tab"], [role="button"], svg {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  /* Vocabulary and sentence text remains selectable */
+  p, span, .selectable {
+    user-select: text;
+    -webkit-user-select: text;
+  }
   ::-webkit-scrollbar {
     display: none;
   }
