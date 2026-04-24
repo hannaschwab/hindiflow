@@ -44,7 +44,7 @@ export default function TutorAvatar({ state = "idle" }) {
             alt="Hindi tutor avatar"
             className="w-full h-full object-cover object-center rounded-full border-4 border-primary/20 shadow-lg bg-secondary"
             initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: 1, scale: 1.15 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.3 }}
           />
