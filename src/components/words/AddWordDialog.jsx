@@ -1,13 +1,73 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, ChevronDown } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const CATEGORIES = ["greetings", "food", "travel", "numbers", "family", "colors", "verbs", "adjectives", "phrases", "other"];
+
+function CategoryPicker({ value, onChange, disabled }) {
+  const [open, setOpen] = useState(false);
+  const isMobile = window.innerWidth < 768;
+
+  const trigger = (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => setOpen(true)}
+      className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm capitalize disabled:opacity-50"
+    >
+      {value}
+      <ChevronDown className="w-4 h-4 opacity-50" />
+    </button>
+  );
+
+  const items = (
+    <div className="p-2 space-y-1">
+      {CATEGORIES.map(c => (
+        <button
+          key={c}
+          type="button"
+          onClick={() => { onChange(c); setOpen(false); }}
+          className={`w-full text-left px-3 py-2 rounded-lg text-sm capitalize transition-colors ${value === c ? "bg-primary text-primary-foreground" : "hover:bg-secondary"}`}
+        >
+          {c.replace(/_/g, " ")}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerTrigger asChild>{trigger}</DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Select Category</DrawerTitle>
+          </DrawerHeader>
+          <div className="pb-6">{items}</div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  return (
+    <>
+      {trigger}
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute z-50 mt-1 w-full bg-popover border border-border rounded-lg shadow-lg">
+            {items}
+          </div>
+        </>
+      )}
+    </>
+  );
+}
 
 export default function AddWordDialog({ onAdd }) {
   const [open, setOpen] = useState(false);
@@ -80,19 +140,16 @@ export default function AddWordDialog({ onAdd }) {
                 value={form.example_english} onChange={e => setForm({...form, example_english: e.target.value})} />
             </div>
           </div>
-          <div>
-            <Label className="flex items-center gap-2">
+          <div className="relative">
+            <Label className="flex items-center gap-2 mb-1">
               Category
               {categorizing && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
             </Label>
-            <Select value={form.category} onValueChange={v => setForm({...form, category: v})} disabled={categorizing}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {CATEGORIES.map(c => (
-                  <SelectItem key={c} value={c} className="capitalize">{c.replace(/_/g, " ")}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CategoryPicker
+              value={form.category}
+              onChange={v => setForm({...form, category: v})}
+              disabled={categorizing}
+            />
           </div>
           <Button type="submit" className="w-full" disabled={!form.hindi || !form.english}>
             Add Word

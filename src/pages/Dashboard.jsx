@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useRef } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { BookOpen, Target, Flame, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -7,12 +8,15 @@ import StatCard from "@/components/dashboard/StatCard";
 import MasteryChart from "@/components/dashboard/MasteryChart";
 import RecentWords from "@/components/dashboard/RecentWords";
 import DailyGoal from "@/components/dashboard/DailyGoal";
+import PullToRefreshWrapper from "@/components/common/PullToRefreshWrapper";
 
 export default function Dashboard() {
+  const queryClient = useQueryClient();
   const { data: words = [], isLoading } = useQuery({
     queryKey: ["vocabulary"],
     queryFn: () => base44.entities.Vocabulary.list("-created_date", 500),
   });
+  const handleRefresh = () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
 
   const totalWords = words.length;
   const mastered = words.filter(w => (w.mastery || 0) >= 80).length;
@@ -28,7 +32,8 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-6xl mx-auto">
+    <PullToRefreshWrapper onRefresh={handleRefresh}>
+    <div className="p-6 md:p-10 max-w-6xl mx-auto pb-20 md:pb-10">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
@@ -59,5 +64,6 @@ export default function Dashboard() {
         <RecentWords words={words} />
       </div>
     </div>
+    </PullToRefreshWrapper>
   );
 }

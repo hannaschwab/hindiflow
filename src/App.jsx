@@ -3,6 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from "framer-motion";
+import { useEffect } from "react";
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -75,12 +76,24 @@ const AuthenticatedApp = () => {
 };
 
 
+function DarkModeSync() {
+  useEffect(() => {
+    const apply = (dark) => document.documentElement.classList.toggle("dark", dark);
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    apply(mq.matches);
+    mq.addEventListener("change", e => apply(e.matches));
+    return () => mq.removeEventListener("change", e => apply(e.matches));
+  }, []);
+  return null;
+}
+
 function App() {
 
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
+          <DarkModeSync />
           <AuthenticatedApp />
         </Router>
         <Toaster />

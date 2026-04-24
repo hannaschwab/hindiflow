@@ -1,9 +1,28 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import MobileNav from "./MobileNav";
 import MobileHeader from "./MobileHeader";
+import Dashboard from "@/pages/Dashboard";
+import WordList from "@/pages/WordList";
+import Practice from "@/pages/Practice";
+import SentenceChallenge from "@/pages/SentenceChallenge";
+
+// Pages kept alive in DOM to preserve scroll + state when switching tabs
+const PERSISTENT_ROUTES = ["/", "/words", "/practice", "/challenge"];
+
+function KeepAliveRoute({ path, currentPath, children }) {
+  const isActive = currentPath === path;
+  return (
+    <div className={isActive ? "h-full" : "hidden"} aria-hidden={!isActive}>
+      {children}
+    </div>
+  );
+}
 
 export default function AppLayout() {
+  const location = useLocation();
+  const isPersistent = PERSISTENT_ROUTES.includes(location.pathname);
+
   return (
     <div
       className="flex min-h-screen bg-background font-inter"
@@ -15,8 +34,27 @@ export default function AppLayout() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <MobileHeader />
-        <main className="flex-1 overflow-auto pb-20 md:pb-0">
-          <Outlet />
+        <main className="flex-1 overflow-hidden relative">
+          {/* Persistent pages — stay mounted, hidden when inactive */}
+          <KeepAliveRoute path="/" currentPath={location.pathname}>
+            <Dashboard />
+          </KeepAliveRoute>
+          <KeepAliveRoute path="/words" currentPath={location.pathname}>
+            <WordList />
+          </KeepAliveRoute>
+          <KeepAliveRoute path="/practice" currentPath={location.pathname}>
+            <Practice />
+          </KeepAliveRoute>
+          <KeepAliveRoute path="/challenge" currentPath={location.pathname}>
+            <SentenceChallenge />
+          </KeepAliveRoute>
+
+          {/* Non-persistent pages rendered via Outlet */}
+          {!isPersistent && (
+            <div className="h-full overflow-auto pb-20 md:pb-0">
+              <Outlet />
+            </div>
+          )}
         </main>
       </div>
       <MobileNav />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search } from "lucide-react";
 import WordRow from "@/components/words/WordRow";
 import AddWordDialog from "@/components/words/AddWordDialog";
+import PullToRefreshWrapper from "@/components/common/PullToRefreshWrapper";
 
 const CATEGORIES = ["all", "greetings", "food", "travel", "numbers", "family", "colors", "verbs", "adjectives", "phrases", "other"];
 
@@ -13,6 +14,7 @@ export default function WordList() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const queryClient = useQueryClient();
+  const handleRefresh = () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
 
   const { data: words = [], isLoading } = useQuery({
     queryKey: ["vocabulary"],
@@ -65,7 +67,8 @@ export default function WordList() {
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-4xl mx-auto">
+    <PullToRefreshWrapper onRefresh={handleRefresh}>
+    <div className="p-6 md:p-10 max-w-4xl mx-auto pb-20 md:pb-10">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Word List</h1>
@@ -108,5 +111,6 @@ export default function WordList() {
         )}
       </div>
     </div>
+    </PullToRefreshWrapper>
   );
 }
