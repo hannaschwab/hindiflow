@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, Settings, Trash2, Sun, Moon } from "lucide-react";
+import { ChevronLeft, Settings, Trash2, Sun, Moon, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/lib/AuthContext";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { base44 } from "@/api/base44Client";
+import { toast } from "sonner";
 
 const PAGE_TITLES = {
   "/": "Dashboard",
@@ -21,6 +23,22 @@ export default function MobileHeader() {
   const { deleteAccount } = useAuth();
   const { isDark, toggle: toggleDark } = useDarkMode();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [suggestion, setSuggestion] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const handleSendSuggestion = async () => {
+    if (!suggestion.trim()) return;
+    setSending(true);
+    const user = await base44.auth.me();
+    await base44.integrations.Core.SendEmail({
+      to: "hanna.schwab@yahoo.de",
+      subject: "HindiFlow – New Suggestion for Improvement",
+      body: `You received a new suggestion from ${user.full_name || "a user"} (${user.email}):\n\n${suggestion}`,
+    });
+    toast.success("Suggestion sent – thank you!");
+    setSuggestion("");
+    setSending(false);
+  };
   const isHome = location.pathname === "/";
   const title = PAGE_TITLES[location.pathname] || "HindiFlow";
 
@@ -62,6 +80,25 @@ export default function MobileHeader() {
               >
                 {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                 {isDark ? "Light" : "Dark"}
+              </button>
+            </div>
+            <div className="border-t border-border pt-4 space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-1.5">
+                <Lightbulb className="w-4 h-4 text-chart-3" /> Suggest an improvement
+              </label>
+              <textarea
+                className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                rows={3}
+                placeholder="What would make HindiFlow better?"
+                value={suggestion}
+                onChange={e => setSuggestion(e.target.value)}
+              />
+              <button
+                onClick={handleSendSuggestion}
+                disabled={!suggestion.trim() || sending}
+                className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 hover:bg-primary/90 transition-colors"
+              >
+                {sending ? "Sending…" : "Send Suggestion"}
               </button>
             </div>
             <div className="border-t border-border pt-4">
