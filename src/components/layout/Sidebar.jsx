@@ -28,9 +28,9 @@ function SettingsDialog() {
     setSending(true);
     const user = await base44.auth.me();
     await base44.integrations.Core.SendEmail({
-      to: user.email,
-      subject: "HindiFlow – Suggestion for improvement",
-      body: suggestion,
+      to: "hanna.schwab@yahoo.de",
+      subject: "HindiFlow – New Suggestion for Improvement",
+      body: `You received a new suggestion from ${user.full_name || "a user"} (${user.email}):\n\n${suggestion}`,
     });
     toast.success("Suggestion sent – thank you!");
     setSuggestion("");
