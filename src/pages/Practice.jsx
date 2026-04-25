@@ -15,6 +15,7 @@ export default function Practice() {
   const [showAnswer, setShowAnswer] = useState(false);
   const [sessionStats, setSessionStats] = useState({ correct: 0, incorrect: 0 });
   const [deck, setDeck] = useState(null);
+  const [direction, setDirection] = useState("hindi_to_english");
   const queryClient = useQueryClient();
 
   const { data: words = [], isLoading } = useQuery({
@@ -150,9 +151,25 @@ export default function Practice() {
 
     return (
       <div className="p-6 md:p-10 max-w-2xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground">Practice</h1>
-          <p className="text-sm text-muted-foreground mt-1">Choose your practice mode</p>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Practice</h1>
+            <p className="text-sm text-muted-foreground mt-1">Choose your practice mode</p>
+          </div>
+          <div className="flex items-center gap-1 bg-secondary rounded-xl p-1 text-sm shrink-0">
+            <button
+              onClick={() => setDirection("hindi_to_english")}
+              className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${direction === "hindi_to_english" ? "bg-card shadow text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              Hindi → EN
+            </button>
+            <button
+              onClick={() => setDirection("english_to_hindi")}
+              className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${direction === "english_to_hindi" ? "bg-card shadow text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              EN → Hindi
+            </button>
+          </div>
         </div>
 
         {/* Daily goal bar */}
@@ -265,7 +282,7 @@ export default function Practice() {
         />
       </div>
 
-      <Flashcard word={word} showAnswer={showAnswer} onFlip={() => setShowAnswer(!showAnswer)} />
+      <Flashcard word={word} showAnswer={showAnswer} onFlip={() => setShowAnswer(!showAnswer)} direction={direction} />
 
       <AnimatePresence>
         {showAnswer && (

@@ -2,7 +2,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { RotateCcw } from "lucide-react";
 import SpeakButton from "@/components/common/SpeakButton";
 
-export default function Flashcard({ word, showAnswer, onFlip }) {
+// direction: "hindi_to_english" (default) | "english_to_hindi"
+export default function Flashcard({ word, showAnswer, onFlip, direction = "hindi_to_english" }) {
+  const hindiFirst = direction === "hindi_to_english";
+
   return (
     <div 
       className="w-full max-w-md mx-auto cursor-pointer perspective-1000"
@@ -19,23 +22,49 @@ export default function Flashcard({ word, showAnswer, onFlip }) {
         >
           {!showAnswer ? (
             <>
-              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Hindi</p>
-              <p className="text-4xl font-bold text-foreground mb-2">{word.transliteration || word.hindi}</p>
-              <div className="flex items-center justify-center gap-2 mt-1">
-                <SpeakButton text={word.hindi} lang="hi-IN" />
-              </div>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
+                {hindiFirst ? "Hindi" : "English"}
+              </p>
+              {hindiFirst ? (
+                <>
+                  <p className="text-4xl font-bold text-foreground mb-2">{word.transliteration || word.hindi}</p>
+                  <div className="flex items-center justify-center gap-2 mt-1">
+                    <SpeakButton text={word.hindi} lang="hi-IN" />
+                  </div>
+                </>
+              ) : (
+                <p className="text-3xl font-bold text-foreground mb-2">{word.english}</p>
+              )}
               <p className="text-xs text-muted-foreground mt-6 flex items-center gap-1">
                 <RotateCcw className="w-3 h-3" /> Tap to reveal
               </p>
             </>
           ) : (
             <>
-              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">English</p>
-              <p className="text-3xl font-bold text-foreground mb-3">{word.english}</p>
-              {word.example_english && (
-                <div className="mt-4 p-3 bg-secondary/50 rounded-xl">
-                  <p className="text-sm text-foreground italic">{word.example_english}</p>
-                </div>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
+                {hindiFirst ? "English" : "Hindi"}
+              </p>
+              {hindiFirst ? (
+                <>
+                  <p className="text-3xl font-bold text-foreground mb-3">{word.english}</p>
+                  {word.example_english && (
+                    <div className="mt-4 p-3 bg-secondary/50 rounded-xl">
+                      <p className="text-sm text-foreground italic">{word.example_english}</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="text-4xl font-bold text-foreground mb-2">{word.transliteration || word.hindi}</p>
+                  <div className="flex items-center justify-center gap-2 mt-1">
+                    <SpeakButton text={word.hindi} lang="hi-IN" />
+                  </div>
+                  {word.example_hindi && (
+                    <div className="mt-4 p-3 bg-secondary/50 rounded-xl">
+                      <p className="text-sm text-foreground italic">{word.example_hindi}</p>
+                    </div>
+                  )}
+                </>
               )}
               <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1">
                 <RotateCcw className="w-3 h-3" /> Tap to flip back
