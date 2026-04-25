@@ -43,7 +43,10 @@ export default function WordList() {
 
   const { data: words = [], isLoading } = useQuery({
     queryKey: ["vocabulary"],
-    queryFn: () => base44.entities.Vocabulary.list("-created_date", 500),
+    queryFn: async () => {
+      const user = await base44.auth.me();
+      return base44.entities.Vocabulary.filter({ created_by: user.email }, "-created_date", 500);
+    },
   });
 
   const createMutation = useMutation({
