@@ -19,6 +19,14 @@ export default function Dashboard() {
       return base44.entities.Vocabulary.filter({ created_by: user.email }, "-created_date", 500);
     },
   });
+  const { data: user } = useQuery({
+    queryKey: ["me"],
+    queryFn: () => base44.auth.me(),
+  });
+
+  const firstName = user?.full_name?.split(" ")[0] || "";
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const handleRefresh = () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
 
   const totalWords = words.length;
@@ -40,7 +48,7 @@ export default function Dashboard() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-            Dashboard
+            {firstName ? `${greeting}, ${firstName}! 🙏` : "Dashboard"}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">Track your Hindi learning journey</p>
         </div>
