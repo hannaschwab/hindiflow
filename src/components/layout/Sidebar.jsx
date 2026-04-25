@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { BookOpen, GraduationCap, List, Upload, BarChart3, Sparkles, Trash2, Sun, Moon } from "lucide-react";
+import { BookOpen, GraduationCap, List, Upload, BarChart3, Sparkles, Trash2, Sun, Moon, Settings, Lightbulb } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuth } from "@/lib/AuthContext";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { base44 } from "@/api/base44Client";
+import { toast } from "sonner";
 
 const navItems = [
   { path: "/", label: "Dashboard", icon: BarChart3 },
@@ -13,10 +16,104 @@ const navItems = [
   { path: "/import", label: "Import Words", icon: Upload },
 ];
 
-export default function Sidebar() {
-  const location = useLocation();
+function SettingsDialog() {
   const { deleteAccount } = useAuth();
   const { isDark, toggle: toggleDark } = useDarkMode();
+  const [open, setOpen] = useState(false);
+  const [suggestion, setSuggestion] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const handleSendSuggestion = async () => {
+    if (!suggestion.trim()) return;
+    setSending(true);
+    const user = await base44.auth.me();
+    await base44.integrations.Core.SendEmail({
+      to: user.email,
+      subject: "HindiFlow – Suggestion for improvement",
+      body: suggestion,
+    });
+    toast.success("Suggestion sent – thank you!");
+    setSuggestion("");
+    setSending(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <button className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors w-full">
+          <Settings className="w-3.5 h-3.5" /> Settings
+        </button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Settings</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-5 mt-2">
+          {/* Dark mode */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-foreground">Appearance</span>
+            <button
+              onClick={toggleDark}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary text-sm font-medium text-foreground transition-colors hover:bg-secondary/80"
+            >
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {isDark ? "Light" : "Dark"}
+            </button>
+          </div>
+
+          {/* Suggestion */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground flex items-center gap-1.5">
+              <Lightbulb className="w-4 h-4 text-chart-3" /> Suggest an improvement
+            </label>
+            <textarea
+              className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              rows={3}
+              placeholder="What would make HindiFlow better?"
+              value={suggestion}
+              onChange={e => setSuggestion(e.target.value)}
+            />
+            <button
+              onClick={handleSendSuggestion}
+              disabled={!suggestion.trim() || sending}
+              className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 hover:bg-primary/90 transition-colors"
+            >
+              {sending ? "Sending…" : "Send Suggestion"}
+            </button>
+          </div>
+
+          {/* Delete account */}
+          <div className="pt-2 border-t border-border">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="flex items-center gap-2 text-sm text-destructive/70 hover:text-destructive transition-colors">
+                  <Trash2 className="w-4 h-4" /> Delete Account
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Account</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete your account and all your vocabulary data. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={deleteAccount}>
+                    Delete Account
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export default function Sidebar() {
+  const location = useLocation();
 
   return (
     <aside className="hidden md:flex flex-col w-64 min-h-screen bg-card border-r border-border p-6">
@@ -51,35 +148,8 @@ export default function Sidebar() {
       </nav>
 
       <div className="mt-auto pt-6 border-t border-border space-y-3">
-        <button
-          onClick={toggleDark}
-          className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors w-full"
-        >
-          {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-          {isDark ? "Light mode" : "Dark mode"}
-        </button>
+        <SettingsDialog />
         <p className="text-xs text-muted-foreground font-inter">Keep practicing daily! 🙏</p>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <button className="flex items-center gap-2 text-xs text-destructive/70 hover:text-destructive transition-colors">
-              <Trash2 className="w-3.5 h-3.5" /> Delete Account
-            </button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete Account</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will permanently delete your account and all your vocabulary data. This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={deleteAccount}>
-                Delete Account
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
     </aside>
   );
