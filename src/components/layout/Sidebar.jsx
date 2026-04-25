@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { BookOpen, GraduationCap, List, Upload, BarChart3, Sparkles, Trash2, Sun, Moon, Settings, Lightbulb } from "lucide-react";
+import { BookOpen, GraduationCap, List, Upload, BarChart3, Sparkles, Trash2, Sun, Moon, Settings, Lightbulb, LogOut } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -103,8 +103,14 @@ function SettingsDialog() {
             </button>
           </div>
 
-          {/* Delete account */}
-          <div className="pt-2 border-t border-border">
+          {/* Logout + Delete account */}
+          <div className="pt-2 border-t border-border space-y-3">
+            <button
+              onClick={() => base44.auth.logout()}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <LogOut className="w-4 h-4" /> Log Out
+            </button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <button className="flex items-center gap-2 text-sm text-destructive/70 hover:text-destructive transition-colors">

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, Settings, Trash2, Sun, Moon, Lightbulb } from "lucide-react";
+import { ChevronLeft, Settings, Trash2, Sun, Moon, Lightbulb, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -124,6 +124,12 @@ export default function MobileHeader() {
             </div>
             <div className="border-t border-border pt-4">
               <p className="text-sm font-medium text-foreground mb-3">Account</p>
+              <button
+                onClick={() => base44.auth.logout()}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-3"
+              >
+                <LogOut className="w-4 h-4" /> Log Out
+              </button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <button className="flex items-center gap-2 text-sm text-destructive/80 hover:text-destructive transition-colors">
