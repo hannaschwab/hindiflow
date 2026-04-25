@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, Settings, Trash2 } from "lucide-react";
+import { ChevronLeft, Settings, Trash2, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/lib/AuthContext";
+import { useDarkMode } from "@/hooks/useDarkMode";
 
 const PAGE_TITLES = {
   "/": "Dashboard",
@@ -18,6 +19,7 @@ export default function MobileHeader() {
   const location = useLocation();
   const navigate = useNavigate();
   const { deleteAccount } = useAuth();
+  const { isDark, toggle: toggleDark } = useDarkMode();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const isHome = location.pathname === "/";
   const title = PAGE_TITLES[location.pathname] || "HindiFlow";
@@ -49,8 +51,18 @@ export default function MobileHeader() {
             <DrawerTitle>Settings</DrawerTitle>
           </DrawerHeader>
           <div className="px-4 pb-8 space-y-6">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Keep practicing daily! 🙏</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-foreground">Appearance</p>
+                <p className="text-xs text-muted-foreground">{isDark ? "Dark mode" : "Light mode"}</p>
+              </div>
+              <button
+                onClick={toggleDark}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary text-sm font-medium text-foreground transition-colors hover:bg-secondary/80"
+              >
+                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                {isDark ? "Light" : "Dark"}
+              </button>
             </div>
             <div className="border-t border-border pt-4">
               <p className="text-sm font-medium text-foreground mb-3">Account</p>
