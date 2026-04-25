@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronLeft, Settings, Trash2, Sun, Moon, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,8 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/lib/AuthContext";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { useGreetingName } from "@/hooks/useGreetingName";
+import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
 import { toast } from "sonner";
 
@@ -22,9 +24,19 @@ export default function MobileHeader() {
   const navigate = useNavigate();
   const { deleteAccount } = useAuth();
   const { isDark, toggle: toggleDark } = useDarkMode();
+  const { greetingName, saveName } = useGreetingName();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [nameInput, setNameInput] = useState("");
   const [suggestion, setSuggestion] = useState("");
   const [sending, setSending] = useState(false);
+
+  useEffect(() => { setNameInput(greetingName); }, [greetingName]);
+
+  const handleSaveName = async () => {
+    if (!nameInput.trim()) return;
+    await saveName(nameInput.trim());
+    toast.success("Name updated!");
+  };
 
   const handleSendSuggestion = async () => {
     if (!suggestion.trim()) return;
@@ -69,6 +81,15 @@ export default function MobileHeader() {
             <DrawerTitle>Settings</DrawerTitle>
           </DrawerHeader>
           <div className="px-4 pb-8 space-y-6">
+            {/* Greeting name */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Your name</label>
+              <div className="flex gap-2">
+                <Input value={nameInput} onChange={e => setNameInput(e.target.value)} placeholder="How should we greet you?" className="flex-1" />
+                <button onClick={handleSaveName} disabled={!nameInput.trim() || nameInput === greetingName} className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors shrink-0">Save</button>
+              </div>
+            </div>
+
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-foreground">Appearance</p>

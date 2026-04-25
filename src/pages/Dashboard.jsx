@@ -9,6 +9,8 @@ import MasteryChart from "@/components/dashboard/MasteryChart";
 import RecentWords from "@/components/dashboard/RecentWords";
 import DailyGoal from "@/components/dashboard/DailyGoal";
 import PullToRefreshWrapper from "@/components/common/PullToRefreshWrapper";
+import WelcomeNameDialog from "@/components/common/WelcomeNameDialog";
+import { useGreetingName } from "@/hooks/useGreetingName";
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
@@ -19,12 +21,7 @@ export default function Dashboard() {
       return base44.entities.Vocabulary.filter({ created_by: user.email }, "-created_date", 500);
     },
   });
-  const { data: user } = useQuery({
-    queryKey: ["me"],
-    queryFn: () => base44.auth.me(),
-  });
-
-  const firstName = user?.full_name?.split(" ")[0] || "";
+  const { greetingName, isLoading: nameLoading, saveName } = useGreetingName();
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const handleRefresh = () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
@@ -34,7 +31,7 @@ export default function Dashboard() {
   const practiced = words.filter(w => (w.times_practiced || 0) > 0).length;
   const avgMastery = totalWords > 0 ? Math.round(words.reduce((s, w) => s + (w.mastery || 0), 0) / totalWords) : 0;
 
-  if (isLoading) {
+  if (isLoading || nameLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-8 h-8 border-4 border-secondary border-t-primary rounded-full animate-spin" />
@@ -43,12 +40,14 @@ export default function Dashboard() {
   }
 
   return (
+    <>
+    <WelcomeNameDialog open={!nameLoading && !greetingName} onSave={saveName} />
     <PullToRefreshWrapper onRefresh={handleRefresh}>
     <div className="p-6 md:p-10 max-w-6xl mx-auto pb-20 md:pb-10">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-            {firstName ? `${greeting}, ${firstName}! 🙏` : "Dashboard"}
+            {greetingName ? `${greeting}, ${greetingName}! 🙏` : "Dashboard"}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">Track your Hindi learning journey</p>
         </div>
@@ -76,5 +75,6 @@ export default function Dashboard() {
       </div>
     </div>
     </PullToRefreshWrapper>
+    </>
   );
 }
