@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Upload, Sparkles, Loader2, CheckCircle2, FileText } from "lucide-react";
+import { Upload, Sparkles, Loader2, CheckCircle2, FileText, ImageIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -66,6 +66,57 @@ Return ALL vocabulary items you can find. Be thorough. If transliterations or ex
       toast.error("Couldn't find any vocabulary in the text.");
     }
 
+    setIsProcessing(false);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsProcessing(true);
+    setResult(null);
+
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+
+    const res = await base44.integrations.Core.InvokeLLM({
+      prompt: `Look at this image and extract all Hindi vocabulary you can find. This could be a photo of a textbook, flashcards, a whiteboard, handwritten notes, or any learning material.
+Extract each Hindi word/phrase with its English translation, transliteration (romanized pronunciation), category, and example sentences if you can infer them.
+If transliterations or examples aren't visible, generate them yourself.
+Return ALL vocabulary items you can find.`,
+      file_urls: [file_url],
+      response_json_schema: {
+        type: "object",
+        properties: {
+          words: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                hindi: { type: "string" },
+                transliteration: { type: "string" },
+                english: { type: "string" },
+                example_hindi: { type: "string" },
+                example_english: { type: "string" },
+                category: {
+                  type: "string",
+                  enum: ["greetings", "food", "travel", "numbers", "family", "colors", "verbs", "adjectives", "phrases", "other"]
+                }
+              },
+              required: ["hindi", "english"]
+            }
+          }
+        }
+      }
+    });
+
+    if (res?.words?.length > 0) {
+      await bulkCreate.mutateAsync(res.words);
+      setResult({ count: res.words.length });
+      toast.success(`Imported ${res.words.length} words from image!`);
+    } else {
+      toast.error("Couldn't find any vocabulary in the image.");
+    }
+
+    e.target.value = "";
     setIsProcessing(false);
   };
 
@@ -157,6 +208,34 @@ Example:
                 <><Sparkles className="w-4 h-4" /> Extract Vocabulary</>
               )}
             </Button>
+          </CardContent>
+        </Card>
+
+        {/* Image upload method */}
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <ImageIcon className="w-5 h-5 text-primary" />
+              Import from Photo
+            </CardTitle>
+            <CardDescription>
+              Take a photo or upload an image of your notes, textbook, or flashcards
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <label className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-secondary/30 transition-colors">
+              <ImageIcon className="w-8 h-8 text-muted-foreground mb-3" />
+              <p className="text-sm text-muted-foreground">Click to upload or take a photo</p>
+              <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP, HEIC</p>
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={handleImageUpload}
+                disabled={isProcessing}
+              />
+            </label>
           </CardContent>
         </Card>
 
