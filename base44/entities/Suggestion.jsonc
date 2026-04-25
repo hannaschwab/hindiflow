@@ -1,0 +1,21 @@
+{
+  "name": "Suggestion",
+  "type": "object",
+  "properties": {
+    "message": {
+      "type": "string",
+      "description": "The suggestion text"
+    },
+    "sender_name": {
+      "type": "string",
+      "description": "Full name of the sender"
+    },
+    "sender_email": {
+      "type": "string",
+      "description": "Email of the sender"
+    }
+  },
+  "required": [
+    "message"
+  ]
+}

@@ -39,10 +39,10 @@ function SettingsDialog() {
     if (!suggestion.trim()) return;
     setSending(true);
     const user = await base44.auth.me();
-    await base44.integrations.Core.SendEmail({
-      to: "hanna.schwab@yahoo.de",
-      subject: "HindiFlow – New Suggestion for Improvement",
-      body: `You received a new suggestion from ${user.full_name || "a user"} (${user.email}):\n\n${suggestion}`,
+    await base44.entities.Suggestion.create({
+      message: suggestion.trim(),
+      sender_name: user.full_name || "",
+      sender_email: user.email || "",
     });
     toast.success("Suggestion sent – thank you!");
     setSuggestion("");
