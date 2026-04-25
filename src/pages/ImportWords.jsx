@@ -211,58 +211,45 @@ Example:
           </CardContent>
         </Card>
 
-        {/* Image upload method */}
+        {/* File & Photo upload method */}
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <ImageIcon className="w-5 h-5 text-primary" />
-              Import from Photo
+              <Upload className="w-5 h-5 text-primary" />
+              Upload File or Photo
             </CardTitle>
             <CardDescription>
-              Take a photo or upload an image of your notes, textbook, or flashcards
+              Upload a document or a photo of your notes, textbook, or flashcards
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <label className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-secondary/30 transition-colors">
-              <ImageIcon className="w-8 h-8 text-muted-foreground mb-3" />
-              <p className="text-sm text-muted-foreground">Click to upload or take a photo</p>
-              <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP, HEIC</p>
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={handleImageUpload}
-                disabled={isProcessing}
-              />
-            </label>
-          </CardContent>
-        </Card>
-
-        {/* File upload method */}
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <FileText className="w-5 h-5 text-primary" />
-              Upload a File
-            </CardTitle>
-            <CardDescription>
-              Upload a document (.csv, .xlsx, .pdf, .json) with your vocabulary
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <label className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-secondary/30 transition-colors">
-              <Upload className="w-8 h-8 text-muted-foreground mb-3" />
-              <p className="text-sm text-muted-foreground">Click to upload or drag and drop</p>
-              <p className="text-xs text-muted-foreground mt-1">CSV, Excel, PDF, or JSON</p>
-              <input
-                type="file"
-                accept=".csv,.xlsx,.xls,.pdf,.json"
-                className="hidden"
-                onChange={handleFileUpload}
-                disabled={isProcessing}
-              />
-            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-secondary/30 transition-colors">
+                <FileText className="w-7 h-7 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground font-medium">Document</p>
+                <p className="text-xs text-muted-foreground mt-0.5">CSV, Excel, PDF, JSON</p>
+                <input
+                  type="file"
+                  accept=".csv,.xlsx,.xls,.pdf,.json"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                  disabled={isProcessing}
+                />
+              </label>
+              <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-secondary/30 transition-colors">
+                <ImageIcon className="w-7 h-7 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground font-medium">Photo</p>
+                <p className="text-xs text-muted-foreground mt-0.5">JPG, PNG, WEBP</p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                  disabled={isProcessing}
+                />
+              </label>
+            </div>
           </CardContent>
         </Card>
 
