@@ -16,7 +16,7 @@ const PERSISTENT_ROUTES = ["/", "/words", "/practice", "/challenge"];
 function KeepAliveRoute({ path, currentPath, children }) {
   const isActive = currentPath === path;
   return (
-    <div className={isActive ? "h-full" : "hidden"} aria-hidden={!isActive}>
+    <div className={isActive ? "h-full overflow-y-auto overscroll-contain" : "hidden"} aria-hidden={!isActive} style={{ WebkitOverflowScrolling: "touch" }}>
       {children}
     </div>
   );
@@ -39,7 +39,7 @@ export default function AppLayout() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <MobileHeader />
-        <main className="flex-1 overflow-hidden relative">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden relative" style={{ WebkitOverflowScrolling: "touch" }}>
           {/* Persistent pages — stay mounted, hidden when inactive */}
           <KeepAliveRoute path="/" currentPath={location.pathname}>
             <Dashboard />
