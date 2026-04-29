@@ -19,6 +19,13 @@ export default function ImportWords() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] }),
   });
 
+  const deduplicateWords = async (newWords) => {
+    const user = await base44.auth.me();
+    const existing = await base44.entities.Vocabulary.filter({ created_by: user.email }, "-created_date", 500);
+    const existingHindi = new Set(existing.map(w => w.hindi?.trim().toLowerCase()));
+    return newWords.filter(w => !existingHindi.has(w.hindi?.trim().toLowerCase()));
+  };
+
   const handleExtract = async () => {
     if (!text.trim()) return;
     setIsProcessing(true);
@@ -58,10 +65,13 @@ Return ALL vocabulary items you can find. Be thorough. If transliterations or ex
     });
 
     if (res?.words?.length > 0) {
-      await bulkCreate.mutateAsync(res.words);
-      setResult({ count: res.words.length });
+      const unique = await deduplicateWords(res.words);
+      const skipped = res.words.length - unique.length;
+      if (unique.length > 0) await bulkCreate.mutateAsync(unique);
+      setResult({ count: unique.length });
       setText("");
-      toast.success(`Imported ${res.words.length} words!`);
+      if (unique.length === 0) toast.info("All words already exist in your list — nothing new to import.");
+      else toast.success(`Imported ${unique.length} words!${skipped > 0 ? ` (${skipped} duplicates skipped)` : ""}`);
     } else {
       toast.error("Couldn't find any vocabulary in the text.");
     }
@@ -109,9 +119,12 @@ Return ALL vocabulary items you can find.`,
     });
 
     if (res?.words?.length > 0) {
-      await bulkCreate.mutateAsync(res.words);
-      setResult({ count: res.words.length });
-      toast.success(`Imported ${res.words.length} words from image!`);
+      const unique = await deduplicateWords(res.words);
+      const skipped = res.words.length - unique.length;
+      if (unique.length > 0) await bulkCreate.mutateAsync(unique);
+      setResult({ count: unique.length });
+      if (unique.length === 0) toast.info("All words already exist in your list — nothing new to import.");
+      else toast.success(`Imported ${unique.length} words from image!${skipped > 0 ? ` (${skipped} duplicates skipped)` : ""}`);
     } else {
       toast.error("Couldn't find any vocabulary in the image.");
     }
@@ -156,9 +169,12 @@ Return ALL vocabulary items you can find.`,
     });
 
     if (res?.status === "success" && res.output?.words?.length > 0) {
-      await bulkCreate.mutateAsync(res.output.words);
-      setResult({ count: res.output.words.length });
-      toast.success(`Imported ${res.output.words.length} words!`);
+      const unique = await deduplicateWords(res.output.words);
+      const skipped = res.output.words.length - unique.length;
+      if (unique.length > 0) await bulkCreate.mutateAsync(unique);
+      setResult({ count: unique.length });
+      if (unique.length === 0) toast.info("All words already exist in your list — nothing new to import.");
+      else toast.success(`Imported ${unique.length} words!${skipped > 0 ? ` (${skipped} duplicates skipped)` : ""}`);
     } else {
       toast.error("Couldn't extract vocabulary from the file.");
     }
