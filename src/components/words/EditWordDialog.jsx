@@ -50,10 +50,7 @@ export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
               <Input value={form.english} onChange={e => setForm({ ...form, english: e.target.value })} />
             </div>
           </div>
-          <div>
-            <Label>Devanagari (optional)</Label>
-            <Input value={form.hindi} onChange={e => setForm({ ...form, hindi: e.target.value })} placeholder="e.g. काम करना" />
-          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>Example (Transliteration)</Label>

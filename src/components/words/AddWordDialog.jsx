@@ -31,7 +31,7 @@ export default function AddWordDialog({ onAdd }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.hindi || !form.english) return;
+    if (!form.transliteration || !form.english) return;
     let finalForm = form;
     if (form.category === "other" && form.hindi && form.english) {
       setCategorizing(true);
@@ -62,9 +62,9 @@ export default function AddWordDialog({ onAdd }) {
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="hindi">Hindi *</Label>
-              <Input id="hindi" placeholder="namaste"
-                value={form.hindi} onChange={e => setForm({...form, hindi: e.target.value})}
+              <Label htmlFor="translit">Hindi *</Label>
+              <Input id="translit" placeholder="namaste"
+                value={form.transliteration} onChange={e => setForm({...form, transliteration: e.target.value})}
                 onBlur={() => autoCategrize(form.hindi, form.english)} />
             </div>
             <div>
@@ -74,11 +74,6 @@ export default function AddWordDialog({ onAdd }) {
                 onChange={e => setForm({...form, english: e.target.value})}
                 onBlur={() => autoCategrize(form.hindi, form.english)} />
             </div>
-          </div>
-          <div>
-            <Label htmlFor="translit">Transliteration</Label>
-            <Input id="translit" placeholder="namaste"
-              value={form.transliteration} onChange={e => setForm({...form, transliteration: e.target.value})} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -112,7 +107,7 @@ export default function AddWordDialog({ onAdd }) {
               }
             />
           </div>
-          <Button type="submit" className="w-full" disabled={!form.hindi || !form.english}>
+          <Button type="submit" className="w-full" disabled={!form.transliteration || !form.english}>
             Add Word
           </Button>
         </form>
