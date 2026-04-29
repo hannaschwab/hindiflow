@@ -88,30 +88,40 @@ export default function OnboardingTour() {
             onClick={dismiss}
           />
 
-          {/* Card */}
+          {/* Card — slides up from bottom on mobile, centered on desktop */}
           <motion.div
             key={step}
-            initial={{ opacity: 0, y: 24, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 24, scale: 0.96 }}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-sm bg-card border border-border rounded-2xl shadow-2xl p-6"
+            className="fixed z-50 
+              bottom-0 left-0 right-0 
+              md:bottom-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-sm
+              bg-card border border-border 
+              rounded-t-3xl md:rounded-2xl 
+              shadow-2xl p-6 pb-8
+              md:pb-6"
+            style={{ paddingBottom: "calc(2rem + env(safe-area-inset-bottom))" }}
           >
             {/* Close */}
-            <button onClick={dismiss} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={dismiss} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors p-1">
               <X className="w-4 h-4" />
             </button>
 
+            {/* Drag handle (mobile only) */}
+            <div className="md:hidden w-10 h-1 bg-border rounded-full mx-auto mb-5" />
+
             {/* Icon */}
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${current.color}`}>
-              <Icon className="w-6 h-6" />
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${current.color}`}>
+              <Icon className="w-7 h-7" />
             </div>
 
             {/* Content */}
-            <h2 className="text-lg font-bold text-foreground mb-2">{current.title}</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-6">{current.description}</p>
+            <h2 className="text-xl font-bold text-foreground mb-2">{current.title}</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-8">{current.description}</p>
 
-            {/* Step dots */}
+            {/* Step dots + nav */}
             <div className="flex items-center justify-between">
               <div className="flex gap-1.5">
                 {STEPS.map((_, i) => (
@@ -124,11 +134,11 @@ export default function OnboardingTour() {
 
               <div className="flex gap-2">
                 {step > 0 && (
-                  <Button variant="outline" size="sm" onClick={prev} className="gap-1">
+                  <Button variant="outline" size="sm" onClick={prev} className="gap-1 h-10 px-4">
                     <ChevronLeft className="w-3.5 h-3.5" /> Back
                   </Button>
                 )}
-                <Button size="sm" onClick={next} className="gap-1">
+                <Button size="sm" onClick={next} className="gap-1 h-10 px-5">
                   {isLast ? "Get started!" : <>Next <ChevronRight className="w-3.5 h-3.5" /></>}
                 </Button>
               </div>
