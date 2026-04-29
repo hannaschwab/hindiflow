@@ -115,7 +115,39 @@ export default function WordList() {
   };
 
   const [autoCategorizing, setAutoCategorizing] = useState(false);
+  const [deduplicating, setDeduplicating] = useState(false);
   const [fixingExamples, setFixingExamples] = useState(false);
+
+  const handleDeduplicate = async () => {
+    setDeduplicating(true);
+    const seen = new Map();
+    const toDelete = [];
+
+    for (const word of [...words].reverse()) {
+      const key = `${word.transliteration?.toLowerCase().trim()}|${word.english?.toLowerCase().trim()}`;
+      if (seen.has(key)) {
+        const existing = seen.get(key);
+        // Merge examples into the keeper if it's missing them
+        const updates = {};
+        if (!existing.example_hindi && word.example_hindi) updates.example_hindi = word.example_hindi;
+        if (!existing.example_english && word.example_english) updates.example_english = word.example_english;
+        if (Object.keys(updates).length > 0) {
+          await base44.entities.Vocabulary.update(existing.id, updates);
+        }
+        toDelete.push(word.id);
+      } else {
+        seen.set(key, word);
+      }
+    }
+
+    for (const id of toDelete) {
+      await base44.entities.Vocabulary.delete(id);
+    }
+
+    await queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
+    setDeduplicating(false);
+    toast.success(toDelete.length > 0 ? `Removed ${toDelete.length} duplicate(s)!` : "No duplicates found.");
+  };
   const { addCategory } = useCategories();
 
   const handleFixExamples = async () => {
@@ -203,6 +235,10 @@ export default function WordList() {
           <p className="text-sm text-muted-foreground mt-1">{words.length} words in your collection</p>
         </div>
         <div className="flex gap-2 flex-wrap">
+          <Button variant="outline" className="gap-2" onClick={handleDeduplicate} disabled={deduplicating}>
+            {deduplicating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Languages className="w-4 h-4" />}
+            {deduplicating ? "Removing..." : "Remove Duplicates"}
+          </Button>
           <Button variant="outline" className="gap-2" onClick={handleAutoCategorize} disabled={autoCategorizing}>
             {autoCategorizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             {autoCategorizing ? "Categorizing..." : "Auto-categorize"}
