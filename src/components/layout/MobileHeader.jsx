@@ -43,6 +43,7 @@ export default function MobileHeader() {
     try {
       if (navigator.share) {
         await navigator.share({ title: "HindiFlow", text: "Learn Hindi vocabulary with AI-powered flashcards!", url });
+        toast.success("Thanks for sharing HindiFlow! 🙏");
         return;
       }
     } catch {}
