@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronRight, ChevronLeft, BarChart3, List, GraduationCap, Sparkles, Upload, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 
 const STORAGE_KEY = "hindiflow_onboarding_done";
 
@@ -86,7 +85,6 @@ function getPositionClasses(position) {
 export default function OnboardingTour() {
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const done = localStorage.getItem(STORAGE_KEY);
@@ -98,22 +96,12 @@ export default function OnboardingTour() {
     setVisible(false);
   };
 
-  const goToStep = (nextStep) => {
-    setStep(nextStep);
-    navigate(STEPS[nextStep].route);
-  };
-
   const next = () => {
-    if (step < STEPS.length - 1) goToStep(step + 1);
+    if (step < STEPS.length - 1) setStep(step + 1);
     else dismiss();
   };
 
-  const prev = () => goToStep(step - 1);
-
-  // Navigate to the correct route when tour first opens
-  useEffect(() => {
-    if (visible) navigate(STEPS[0].route);
-  }, [visible]);
+  const prev = () => setStep(step - 1);
 
   const current = STEPS[step];
   const Icon = current.icon;
