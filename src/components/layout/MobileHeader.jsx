@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, Settings, Trash2, Sun, Moon, Lightbulb, LogOut } from "lucide-react";
+import { ChevronLeft, Settings, Trash2, Sun, Moon, Lightbulb, LogOut, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -36,6 +36,16 @@ export default function MobileHeader() {
     if (!nameInput.trim()) return;
     await saveName(nameInput.trim());
     toast.success("Name updated!");
+  };
+
+  const handleShare = async () => {
+    const shareData = { title: "HindiFlow", text: "Learn Hindi vocabulary with AI-powered flashcards!", url: window.location.origin };
+    if (navigator.share) {
+      await navigator.share(shareData);
+    } else {
+      await navigator.clipboard.writeText(window.location.origin);
+      toast.success("Link copied to clipboard!");
+    }
   };
 
   const handleSendSuggestion = async () => {
@@ -120,6 +130,14 @@ export default function MobileHeader() {
                 className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 hover:bg-primary/90 transition-colors"
               >
                 {sending ? "Sending…" : "Send Suggestion"}
+              </button>
+            </div>
+            <div className="border-t border-border pt-4">
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4 w-full"
+              >
+                <Share2 className="w-4 h-4" /> Share HindiFlow
               </button>
             </div>
             <div className="border-t border-border pt-4">
