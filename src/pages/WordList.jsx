@@ -180,10 +180,6 @@ export default function WordList() {
           <p className="text-sm text-muted-foreground mt-1">{words.length} words in your collection</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" className="gap-2" onClick={handleFixExamples} disabled={fixingExamples}>
-            {fixingExamples ? <Loader2 className="w-4 h-4 animate-spin" /> : <Languages className="w-4 h-4" />}
-            {fixingExamples ? "Converting..." : "Fix examples"}
-          </Button>
           <Button variant="outline" className="gap-2" onClick={handleAutoCategorize} disabled={autoCategorizing}>
             {autoCategorizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             {autoCategorizing ? "Categorizing..." : "Auto-categorize"}
