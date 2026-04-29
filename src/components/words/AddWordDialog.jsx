@@ -82,7 +82,7 @@ export default function AddWordDialog({ onAdd }) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="exHindi">Example (Hindi)</Label>
+              <Label htmlFor="exHindi">Example (Transliteration)</Label>
               <Input id="exHindi" placeholder="Namaste, aap kaise hain?"
                 value={form.example_hindi} onChange={e => setForm({...form, example_hindi: e.target.value})} />
             </div>

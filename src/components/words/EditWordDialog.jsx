@@ -56,8 +56,8 @@ export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Example (Hindi)</Label>
-              <Input value={form.example_hindi} onChange={e => setForm({ ...form, example_hindi: e.target.value })} />
+              <Label>Example (Transliteration)</Label>
+              <Input value={form.example_hindi} onChange={e => setForm({ ...form, example_hindi: e.target.value })} placeholder="e.g. Main safar kar raha hoon" />
             </div>
             <div>
               <Label>Example (English)</Label>

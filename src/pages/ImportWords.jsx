@@ -42,6 +42,7 @@ IMPORTANT RULES:
 - Copy the Hindi words/phrases EXACTLY as they appear in the text. Do NOT replace, correct, or substitute any Hindi word with a different Hindi word.
 - For the English translation, you may fix minor typos but do NOT change the meaning or replace it with a different word.
 - If transliterations or examples aren't explicitly given, generate them based on the exact Hindi word provided.
+- For the "example_hindi" field, provide the example sentence in transliteration (romanized Latin script, e.g. "Main ghar ja raha hoon"), NOT in Devanagari/Hindi script.
 Return ALL vocabulary items you can find.`,
       response_json_schema: {
         type: "object",
@@ -98,6 +99,7 @@ IMPORTANT RULES:
 - Copy the Hindi words/phrases EXACTLY as they appear in the image. Do NOT replace or substitute any Hindi word with a different Hindi word.
 - For the English translation, you may fix minor typos but do NOT change the meaning.
 - If transliterations or examples aren't visible, generate them based on the exact Hindi word shown.
+- For the "example_hindi" field, provide the example sentence in transliteration (romanized Latin script, e.g. "Main ghar ja raha hoon"), NOT in Devanagari/Hindi script.
 Return ALL vocabulary items you can find.`,
       file_urls: [file_url],
       response_json_schema: {

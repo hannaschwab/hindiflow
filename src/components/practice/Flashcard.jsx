@@ -61,7 +61,7 @@ export default function Flashcard({ word, showAnswer, onFlip, direction = "hindi
                   </div>
                   {word.example_hindi && (
                     <div className="mt-4 p-3 bg-secondary/50 rounded-xl">
-                      <p className="text-sm text-foreground italic">{word.example_hindi}</p>
+                      <p className="text-sm text-foreground italic font-inter">{word.example_hindi}</p>
                     </div>
                   )}
                 </>
