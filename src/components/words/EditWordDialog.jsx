@@ -18,7 +18,7 @@ export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!form.hindi || !form.english) return;
+    if (!form.transliteration || !form.english) return;
     onSave(word.id, form);
     onOpenChange(false);
   };
@@ -43,7 +43,7 @@ export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>Hindi *</Label>
-              <Input value={form.hindi} onChange={e => setForm({ ...form, hindi: e.target.value })} />
+              <Input value={form.transliteration} onChange={e => setForm({ ...form, transliteration: e.target.value })} placeholder="e.g. kaam karna" />
             </div>
             <div>
               <Label>English *</Label>
@@ -51,8 +51,8 @@ export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
             </div>
           </div>
           <div>
-            <Label>Transliteration</Label>
-            <Input value={form.transliteration} onChange={e => setForm({ ...form, transliteration: e.target.value })} />
+            <Label>Devanagari (optional)</Label>
+            <Input value={form.hindi} onChange={e => setForm({ ...form, hindi: e.target.value })} placeholder="e.g. काम करना" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -72,7 +72,7 @@ export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
               trigger={categoryTrigger}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={!form.hindi || !form.english}>
+          <Button type="submit" className="w-full" disabled={!form.transliteration || !form.english}>
             Save Changes
           </Button>
         </form>
