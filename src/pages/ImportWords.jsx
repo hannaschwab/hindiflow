@@ -70,8 +70,8 @@ Return ALL vocabulary items you can find. Be thorough. If transliterations or ex
       if (unique.length > 0) await bulkCreate.mutateAsync(unique);
       setResult({ count: unique.length });
       setText("");
-      if (unique.length === 0) toast.info("All words already exist in your list — nothing new to import.");
-      else toast.success(`Imported ${unique.length} words!${skipped > 0 ? ` (${skipped} duplicates skipped)` : ""}`);
+      if (unique.length === 0) toast.info("All words already exist in your list.");
+      else toast.success(`Imported ${unique.length} words!`);
     } else {
       toast.error("Couldn't find any vocabulary in the text.");
     }
@@ -123,8 +123,8 @@ Return ALL vocabulary items you can find.`,
       const skipped = res.words.length - unique.length;
       if (unique.length > 0) await bulkCreate.mutateAsync(unique);
       setResult({ count: unique.length });
-      if (unique.length === 0) toast.info("All words already exist in your list — nothing new to import.");
-      else toast.success(`Imported ${unique.length} words from image!${skipped > 0 ? ` (${skipped} duplicates skipped)` : ""}`);
+      if (unique.length === 0) toast.info("All words already exist in your list.");
+      else toast.success(`Imported ${unique.length} words from image!`);
     } else {
       toast.error("Couldn't find any vocabulary in the image.");
     }
@@ -173,8 +173,8 @@ Return ALL vocabulary items you can find.`,
       const skipped = res.output.words.length - unique.length;
       if (unique.length > 0) await bulkCreate.mutateAsync(unique);
       setResult({ count: unique.length });
-      if (unique.length === 0) toast.info("All words already exist in your list — nothing new to import.");
-      else toast.success(`Imported ${unique.length} words!${skipped > 0 ? ` (${skipped} duplicates skipped)` : ""}`);
+      if (unique.length === 0) toast.info("All words already exist in your list.");
+      else toast.success(`Imported ${unique.length} words!`);
     } else {
       toast.error("Couldn't extract vocabulary from the file.");
     }

@@ -6,6 +6,7 @@ import Dashboard from "@/pages/Dashboard";
 import WordList from "@/pages/WordList";
 import Practice from "@/pages/Practice";
 import SentenceChallenge from "@/pages/SentenceChallenge";
+import OnboardingTour from "@/components/common/OnboardingTour";
 
 // Pages kept alive in DOM to preserve scroll + state when switching tabs
 const PERSISTENT_ROUTES = ["/", "/words", "/practice", "/challenge"];
@@ -58,6 +59,7 @@ export default function AppLayout() {
         </main>
       </div>
       <MobileNav />
+      <OnboardingTour />
     </div>
   );
 }
