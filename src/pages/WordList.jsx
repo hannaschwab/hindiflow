@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
@@ -113,11 +113,15 @@ export default function WordList() {
     createMutation.mutate(newWord);
   };
 
+  useEffect(() => {
+    if (words.length > 0) handleDeduplicate(true);
+  }, [words.length]);
+
   const [autoCategorizing, setAutoCategorizing] = useState(false);
   const [deduplicating, setDeduplicating] = useState(false);
   const [fixingExamples, setFixingExamples] = useState(false);
 
-  const handleDeduplicate = async () => {
+  const handleDeduplicate = async (silent = false) => {
     setDeduplicating(true);
     const seen = new Map();
     const toDelete = [];
@@ -145,7 +149,8 @@ export default function WordList() {
 
     await queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
     setDeduplicating(false);
-    toast.success(toDelete.length > 0 ? `Removed ${toDelete.length} duplicate(s)!` : "No duplicates found.");
+    if (!silent) toast.success(toDelete.length > 0 ? `Removed ${toDelete.length} duplicate(s)!` : "No duplicates found.");
+    else if (toDelete.length > 0) toast.success(`Removed ${toDelete.length} duplicate(s)!`);
   };
   const { addCategory } = useCategories();
 
