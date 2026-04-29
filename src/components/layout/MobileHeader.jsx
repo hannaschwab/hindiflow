@@ -10,6 +10,8 @@ import { useGreetingName } from "@/hooks/useGreetingName";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
 import { toast } from "sonner";
+import { useToast } from "@/components/ui/use-toast";
+
 
 const PAGE_TITLES = {
   "/": "Dashboard",
@@ -29,6 +31,7 @@ export default function MobileHeader() {
   const [nameInput, setNameInput] = useState("");
   const [suggestion, setSuggestion] = useState("");
   const [sending, setSending] = useState(false);
+  const { toast: shadToast } = useToast();
 
   useEffect(() => { setNameInput(greetingName); }, [greetingName]);
 
@@ -43,12 +46,12 @@ export default function MobileHeader() {
     try {
       if (navigator.share) {
         await navigator.share({ title: "HindiFlow", text: "Learn Hindi vocabulary with AI-powered flashcards!", url });
-        toast.success("Thanks for sharing HindiFlow! 🙏");
+        shadToast({ title: "Thanks for sharing HindiFlow! 🙏" });
         return;
       }
     } catch {}
     await navigator.clipboard.writeText(url);
-    toast.success("Link copied to clipboard!");
+    shadToast({ title: "Link copied to clipboard!" });
   };
 
   const handleSendSuggestion = async () => {

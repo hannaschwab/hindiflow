@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { useGreetingName } from "@/hooks/useGreetingName";
 import { base44 } from "@/api/base44Client";
-import { toast } from "sonner";
+import { useToast } from "@/components/ui/use-toast";
 
 const navItems = [
   { path: "/", label: "Dashboard", icon: BarChart3 },
@@ -26,13 +26,14 @@ function SettingsDialog() {
   const [nameInput, setNameInput] = useState("");
   const [suggestion, setSuggestion] = useState("");
   const [sending, setSending] = useState(false);
+  const { toast: shadToast } = useToast();
 
   useEffect(() => { setNameInput(greetingName); }, [greetingName]);
 
   const handleSaveName = async () => {
     if (!nameInput.trim()) return;
     await saveName(nameInput.trim());
-    toast.success("Name updated!");
+    shadToast({ title: "Name updated!" });
   };
 
   const handleShare = async () => {
@@ -40,12 +41,12 @@ function SettingsDialog() {
     try {
       if (navigator.share) {
         await navigator.share({ title: "HindiFlow", text: "Learn Hindi vocabulary with AI-powered flashcards!", url });
-        toast.success("Thanks for sharing HindiFlow! 🙏");
+        shadToast({ title: "Thanks for sharing HindiFlow! 🙏" });
         return;
       }
     } catch {}
     await navigator.clipboard.writeText(url);
-    toast.success("Link copied to clipboard!");
+    shadToast({ title: "Link copied to clipboard!" });
   };
 
   const handleSendSuggestion = async () => {
@@ -57,7 +58,7 @@ function SettingsDialog() {
       sender_name: user.full_name || "",
       sender_email: user.email || "",
     });
-    toast.success("Suggestion sent – thank you!");
+    shadToast({ title: "Suggestion sent – thank you!" });
     setSuggestion("");
     setSending(false);
   };
