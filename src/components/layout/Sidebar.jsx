@@ -36,13 +36,15 @@ function SettingsDialog() {
   };
 
   const handleShare = async () => {
-    const shareData = { title: "HindiFlow", text: "Learn Hindi vocabulary with AI-powered flashcards!", url: window.location.origin };
-    if (navigator.share) {
-      await navigator.share(shareData);
-    } else {
-      await navigator.clipboard.writeText(window.location.origin);
-      toast.success("Link copied to clipboard!");
-    }
+    const url = window.location.origin;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "HindiFlow", text: "Learn Hindi vocabulary with AI-powered flashcards!", url });
+        return;
+      }
+    } catch {}
+    await navigator.clipboard.writeText(url);
+    toast.success("Link copied to clipboard!");
   };
 
   const handleSendSuggestion = async () => {
