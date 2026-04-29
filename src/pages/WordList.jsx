@@ -91,6 +91,29 @@ export default function WordList() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] }),
   });
 
+  const handleAddWord = (newWord) => {
+    const existing = words.find(w =>
+      w.transliteration?.toLowerCase().trim() === newWord.transliteration?.toLowerCase().trim() &&
+      w.english?.toLowerCase().trim() === newWord.english?.toLowerCase().trim()
+    );
+
+    if (existing) {
+      const updates = {};
+      if (!existing.example_hindi && newWord.example_hindi) updates.example_hindi = newWord.example_hindi;
+      if (!existing.example_english && newWord.example_english) updates.example_english = newWord.example_english;
+
+      if (Object.keys(updates).length > 0) {
+        updateMutation.mutate({ id: existing.id, data: updates });
+        toast.success("Examples added to existing word!");
+      } else {
+        toast.info("This word already exists in your collection.");
+      }
+      return;
+    }
+
+    createMutation.mutate(newWord);
+  };
+
   const [autoCategorizing, setAutoCategorizing] = useState(false);
   const [fixingExamples, setFixingExamples] = useState(false);
   const { addCategory } = useCategories();
@@ -184,7 +207,7 @@ export default function WordList() {
             {autoCategorizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             {autoCategorizing ? "Categorizing..." : "Auto-categorize"}
           </Button>
-          <AddWordDialog onAdd={createMutation.mutate} />
+          <AddWordDialog onAdd={handleAddWord} />
         </div>
       </div>
 
