@@ -17,11 +17,11 @@ export default function AddWordDialog({ onAdd }) {
     example_hindi: "", example_english: "", category: "other"
   });
 
-  const autoCategrize = async (hindi, english) => {
-    if (!hindi || !english) return;
+  const autoCategrize = async (transliteration, english) => {
+    if (!transliteration || !english) return;
     setCategorizing(true);
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Categorize the Hindi word "${hindi}" (meaning: "${english}") into exactly one of these categories: greetings, food, travel, numbers, family, colors, verbs, adjectives, phrases, other. Reply with only the category name, nothing else.`,
+      prompt: `Categorize the Hindi word "${transliteration}" (meaning: "${english}") into exactly one of these categories: greetings, food, travel, numbers, family, colors, verbs, adjectives, phrases, other. Reply with only the category name, nothing else.`,
       response_json_schema: { type: "object", properties: { category: { type: "string" } } }
     });
     const category = allCategories.includes(result?.category) ? result.category : "other";
@@ -33,10 +33,10 @@ export default function AddWordDialog({ onAdd }) {
     e.preventDefault();
     if (!form.transliteration || !form.english) return;
     let finalForm = form;
-    if (form.category === "other" && form.hindi && form.english) {
+    if (form.category === "other" && form.transliteration && form.english) {
       setCategorizing(true);
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Categorize the Hindi word "${form.hindi}" (meaning: "${form.english}") into exactly one of these categories: greetings, food, travel, numbers, family, colors, verbs, adjectives, phrases, other. Reply with only the category name, nothing else. Do NOT change or replace the Hindi word or English meaning - only assign a category.`,
+        prompt: `Categorize the Hindi word "${form.transliteration}" (meaning: "${form.english}") into exactly one of these categories: greetings, food, travel, numbers, family, colors, verbs, adjectives, phrases, other. Reply with only the category name, nothing else. Do NOT change or replace the Hindi word or English meaning - only assign a category.`,
         response_json_schema: { type: "object", properties: { category: { type: "string" } } }
       });
       const category = allCategories.includes(result?.category) ? result.category : "other";
@@ -65,14 +65,14 @@ export default function AddWordDialog({ onAdd }) {
               <Label htmlFor="translit">Hindi *</Label>
               <Input id="translit" placeholder="namaste"
                 value={form.transliteration} onChange={e => setForm({...form, transliteration: e.target.value})}
-                onBlur={() => autoCategrize(form.hindi, form.english)} />
+                onBlur={() => autoCategrize(form.transliteration, form.english)} />
             </div>
             <div>
               <Label htmlFor="english">English *</Label>
               <Input id="english" placeholder="Hello"
                 value={form.english}
                 onChange={e => setForm({...form, english: e.target.value})}
-                onBlur={() => autoCategrize(form.hindi, form.english)} />
+                onBlur={() => autoCategrize(form.transliteration, form.english)} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
