@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ChevronDown, Sparkles, Loader2, Languages } from "lucide-react";
+import { Search, ChevronDown, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import WordRow from "@/components/words/WordRow";
 import AddWordDialog from "@/components/words/AddWordDialog";
@@ -92,30 +92,7 @@ export default function WordList() {
   });
 
   const [autoCategorizing, setAutoCategorizing] = useState(false);
-  const [fixingExamples, setFixingExamples] = useState(false);
   const { addCategory } = useCategories();
-
-  const handleFixExamples = async () => {
-    // Find words that have example_hindi containing Devanagari script
-    const devanagariRegex = /[\u0900-\u097F]/;
-    const toFix = words.filter(w => w.example_hindi && devanagariRegex.test(w.example_hindi));
-    if (toFix.length === 0) { toast.info("All examples are already in transliteration!"); return; }
-    setFixingExamples(true);
-    let updated = 0;
-    for (const word of toFix) {
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Transliterate this Hindi example sentence into romanized Latin script (e.g. "Main ghar ja raha hoon"). Only output the transliteration, nothing else.\n\nHindi sentence: "${word.example_hindi}"`,
-        response_json_schema: { type: "object", properties: { transliteration: { type: "string" } } }
-      });
-      if (result?.transliteration) {
-        await base44.entities.Vocabulary.update(word.id, { example_hindi: result.transliteration });
-        updated++;
-      }
-    }
-    await queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
-    setFixingExamples(false);
-    toast.success(`Converted ${updated} examples to transliteration!`);
-  };
 
   const handleAutoCategorize = async () => {
     const uncategorized = words.filter(w => !w.category || w.category === "other");
@@ -181,10 +158,6 @@ export default function WordList() {
           <p className="text-sm text-muted-foreground mt-1">{words.length} words in your collection</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" className="gap-2" onClick={handleFixExamples} disabled={fixingExamples}>
-            {fixingExamples ? <Loader2 className="w-4 h-4 animate-spin" /> : <Languages className="w-4 h-4" />}
-            {fixingExamples ? "Converting..." : "Fix examples"}
-          </Button>
           <Button variant="outline" className="gap-2" onClick={handleAutoCategorize} disabled={autoCategorizing}>
             {autoCategorizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             {autoCategorizing ? "Categorizing..." : "Auto-categorize"}
