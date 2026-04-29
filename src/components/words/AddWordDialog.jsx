@@ -36,7 +36,7 @@ export default function AddWordDialog({ onAdd }) {
     if (form.category === "other" && form.hindi && form.english) {
       setCategorizing(true);
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Categorize the Hindi word "${form.hindi}" (meaning: "${form.english}") into exactly one of these categories: greetings, food, travel, numbers, family, colors, verbs, adjectives, phrases, other. Reply with only the category name, nothing else.`,
+        prompt: `Categorize the Hindi word "${form.hindi}" (meaning: "${form.english}") into exactly one of these categories: greetings, food, travel, numbers, family, colors, verbs, adjectives, phrases, other. Reply with only the category name, nothing else. Do NOT change or replace the Hindi word or English meaning - only assign a category.`,
         response_json_schema: { type: "object", properties: { category: { type: "string" } } }
       });
       const category = allCategories.includes(result?.category) ? result.category : "other";

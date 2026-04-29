@@ -38,7 +38,11 @@ Extract each Hindi word/phrase with its English translation, transliteration (ro
 Text:
 ${text}
 
-Return ALL vocabulary items you can find. Be thorough. If transliterations or examples aren't explicitly given, generate them.`,
+IMPORTANT RULES:
+- Copy the Hindi words/phrases EXACTLY as they appear in the text. Do NOT replace, correct, or substitute any Hindi word with a different Hindi word.
+- For the English translation, you may fix minor typos but do NOT change the meaning or replace it with a different word.
+- If transliterations or examples aren't explicitly given, generate them based on the exact Hindi word provided.
+Return ALL vocabulary items you can find.`,
       response_json_schema: {
         type: "object",
         properties: {
@@ -90,7 +94,10 @@ Return ALL vocabulary items you can find. Be thorough. If transliterations or ex
     const res = await base44.integrations.Core.InvokeLLM({
       prompt: `Look at this image and extract all Hindi vocabulary you can find. This could be a photo of a textbook, flashcards, a whiteboard, handwritten notes, or any learning material.
 Extract each Hindi word/phrase with its English translation, transliteration (romanized pronunciation), category, and example sentences if you can infer them.
-If transliterations or examples aren't visible, generate them yourself.
+IMPORTANT RULES:
+- Copy the Hindi words/phrases EXACTLY as they appear in the image. Do NOT replace or substitute any Hindi word with a different Hindi word.
+- For the English translation, you may fix minor typos but do NOT change the meaning.
+- If transliterations or examples aren't visible, generate them based on the exact Hindi word shown.
 Return ALL vocabulary items you can find.`,
       file_urls: [file_url],
       response_json_schema: {
