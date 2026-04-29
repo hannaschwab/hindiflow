@@ -93,8 +93,7 @@ export default function WordList() {
 
   const handleAddWord = (newWord) => {
     const existing = words.find(w =>
-      w.transliteration?.toLowerCase().trim() === newWord.transliteration?.toLowerCase().trim() &&
-      w.english?.toLowerCase().trim() === newWord.english?.toLowerCase().trim()
+      w.transliteration?.toLowerCase().trim() === newWord.transliteration?.toLowerCase().trim()
     );
 
     if (existing) {
@@ -124,7 +123,7 @@ export default function WordList() {
     const toDelete = [];
 
     for (const word of [...words].reverse()) {
-      const key = `${word.transliteration?.toLowerCase().trim()}|${word.english?.toLowerCase().trim()}`;
+      const key = word.transliteration?.toLowerCase().trim();
       if (seen.has(key)) {
         const existing = seen.get(key);
         // Merge examples into the keeper if it's missing them
