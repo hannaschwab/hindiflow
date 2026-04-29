@@ -24,7 +24,7 @@ export default function WordRow({ word, onDelete, onEdit }) {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="text-base font-semibold text-foreground">{word.transliteration || word.hindi}</span>
-              <SpeakButton text={word.hindi} lang="hi-IN" className="h-7 w-7" />
+              <SpeakButton text={word.transliteration || word.hindi} lang="hi-IN" className="h-7 w-7" />
             </div>
             <p className="text-sm text-muted-foreground truncate">{word.english}</p>
           </div>
