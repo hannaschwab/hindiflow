@@ -15,7 +15,7 @@ export default function Practice() {
   const [showAnswer, setShowAnswer] = useState(false);
   const [sessionStats, setSessionStats] = useState({ correct: 0, incorrect: 0 });
   const [deck, setDeck] = useState(null);
-  const [direction, setDirection] = useState("hindi_to_english");
+  const [direction, setDirection] = useState("english_to_hindi");
   const queryClient = useQueryClient();
 
   const { data: words = [], isLoading } = useQuery({
