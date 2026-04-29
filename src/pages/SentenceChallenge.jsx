@@ -134,7 +134,7 @@ export default function SentenceChallenge() {
   };
 
   return (
-    <div className="flex flex-col h-screen md:h-[calc(100vh-0px)] max-w-2xl mx-auto p-4 md:p-8 pb-24 md:pb-8">
+    <div className="flex flex-col h-full max-w-2xl mx-auto p-4 md:p-8 pb-24 md:pb-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
@@ -186,7 +186,7 @@ export default function SentenceChallenge() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+      <div className="flex-1 overflow-y-auto space-y-4 pr-1 overscroll-contain" style={{ WebkitOverflowScrolling: "touch" }}>
         {starting && (
           <div className="flex gap-3 justify-start">
             <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shrink-0">
