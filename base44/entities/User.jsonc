@@ -1,0 +1,19 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "user"
+      ],
+      "default": "user"
+    },
+    "default_vocab_seeded": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the default vocabulary has been seeded for this user"
+    }
+  }
+}

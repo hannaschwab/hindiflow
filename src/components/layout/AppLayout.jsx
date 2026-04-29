@@ -7,6 +7,8 @@ import WordList from "@/pages/WordList";
 import Practice from "@/pages/Practice";
 import SentenceChallenge from "@/pages/SentenceChallenge";
 import OnboardingTour from "@/components/common/OnboardingTour";
+import { useAuth } from "@/lib/AuthContext";
+import { useVocabSeeding } from "@/hooks/useVocabSeeding";
 
 // Pages kept alive in DOM to preserve scroll + state when switching tabs
 const PERSISTENT_ROUTES = ["/", "/words", "/practice", "/challenge"];
@@ -23,6 +25,8 @@ function KeepAliveRoute({ path, currentPath, children }) {
 export default function AppLayout() {
   const location = useLocation();
   const isPersistent = PERSISTENT_ROUTES.includes(location.pathname);
+  const { user } = useAuth();
+  useVocabSeeding(user);
 
   return (
     <div
