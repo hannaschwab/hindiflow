@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ChevronDown, Sparkles, Loader2, Languages } from "lucide-react";
+import { Search, ChevronDown, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import WordRow from "@/components/words/WordRow";
 import AddWordDialog from "@/components/words/AddWordDialog";
@@ -239,10 +239,6 @@ export default function WordList() {
           <p className="text-sm text-muted-foreground mt-1">{words.length} words in your collection</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" className="gap-2" onClick={handleDeduplicate} disabled={deduplicating}>
-            {deduplicating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Languages className="w-4 h-4" />}
-            {deduplicating ? "Removing..." : "Remove Duplicates"}
-          </Button>
           <Button variant="outline" className="gap-2" onClick={handleAutoCategorize} disabled={autoCategorizing}>
             {autoCategorizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             {autoCategorizing ? "Categorizing..." : "Auto-categorize"}
