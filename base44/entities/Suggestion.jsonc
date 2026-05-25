@@ -20,18 +20,14 @@
   ],
   "rls": {
     "create": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "user"
-          }
+      "user_condition": {
+        "role": {
+          "$in": [
+            "admin",
+            "user"
+          ]
         }
-      ]
+      }
     },
     "read": {
       "user_condition": {
