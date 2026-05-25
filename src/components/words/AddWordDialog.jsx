@@ -62,7 +62,7 @@ export default function AddWordDialog({ onAdd }) {
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="translit">Hindi *</Label>
+              <Label htmlFor="translit">Hinglish *</Label>
               <Input id="translit" placeholder="namaste"
                 value={form.transliteration} onChange={e => setForm({...form, transliteration: e.target.value})}
                 onBlur={() => autoCategrize(form.transliteration, form.english)} />
@@ -77,7 +77,7 @@ export default function AddWordDialog({ onAdd }) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="exHindi">Example (Transliteration)</Label>
+              <Label htmlFor="exHindi">Example Hinglish</Label>
               <Input id="exHindi" placeholder="Namaste, aap kaise hain?"
                 value={form.example_hindi} onChange={e => setForm({...form, example_hindi: e.target.value})} />
             </div>

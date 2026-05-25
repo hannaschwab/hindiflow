@@ -42,7 +42,7 @@ export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Hindi *</Label>
+              <Label>Hinglish *</Label>
               <Input value={form.transliteration} onChange={e => setForm({ ...form, transliteration: e.target.value })} placeholder="e.g. kaam karna" />
             </div>
             <div>
@@ -53,7 +53,7 @@ export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Example (Transliteration)</Label>
+              <Label>Example Hinglish</Label>
               <Input value={form.example_hindi} onChange={e => setForm({ ...form, example_hindi: e.target.value })} placeholder="e.g. Main safar kar raha hoon" />
             </div>
             <div>
