@@ -7,6 +7,7 @@ import { Plus, Loader2, ChevronDown } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import CategoryPicker from "@/components/words/CategoryPicker";
 import { useCategories } from "@/hooks/useCategories";
+import PronunciationRecorder from "@/components/words/PronunciationRecorder";
 
 export default function AddWordDialog({ onAdd }) {
   const [open, setOpen] = useState(false);
@@ -14,7 +15,8 @@ export default function AddWordDialog({ onAdd }) {
   const { allCategories } = useCategories();
   const [form, setForm] = useState({
     hindi: "", transliteration: "", english: "",
-    example_hindi: "", example_english: "", category: "other"
+    example_hindi: "", example_english: "", category: "other",
+    pronunciation_audio_url: ""
   });
 
   const autoCategrize = async (transliteration, english) => {
@@ -44,7 +46,7 @@ export default function AddWordDialog({ onAdd }) {
       setCategorizing(false);
     }
     onAdd(finalForm);
-    setForm({ hindi: "", transliteration: "", english: "", example_hindi: "", example_english: "", category: "other" });
+    setForm({ hindi: "", transliteration: "", english: "", example_hindi: "", example_english: "", category: "other", pronunciation_audio_url: "" });
     setOpen(false);
   };
 
@@ -105,6 +107,14 @@ export default function AddWordDialog({ onAdd }) {
                   <ChevronDown className="w-4 h-4 opacity-50" />
                 </button>
               }
+            />
+          </div>
+          <div>
+            <Label className="mb-1 block">Pronunciation</Label>
+            <PronunciationRecorder
+              existingUrl={form.pronunciation_audio_url}
+              onRecorded={({ url }) => setForm(f => ({ ...f, pronunciation_audio_url: url }))}
+              onDelete={() => setForm(f => ({ ...f, pronunciation_audio_url: "" }))}
             />
           </div>
           <Button type="submit" className="w-full" disabled={!form.transliteration || !form.english}>

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronDown } from "lucide-react";
 import CategoryPicker from "@/components/words/CategoryPicker";
+import PronunciationRecorder from "@/components/words/PronunciationRecorder";
 
 export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
   const [form, setForm] = useState({
@@ -14,6 +15,7 @@ export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
     example_hindi: word.example_hindi || "",
     example_english: word.example_english || "",
     category: word.category || "other",
+    pronunciation_audio_url: word.pronunciation_audio_url || "",
   });
 
   const handleSubmit = (e) => {
@@ -67,6 +69,14 @@ export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
               value={form.category}
               onChange={v => setForm({ ...form, category: v })}
               trigger={categoryTrigger}
+            />
+          </div>
+          <div>
+            <Label className="mb-1 block">Pronunciation</Label>
+            <PronunciationRecorder
+              existingUrl={form.pronunciation_audio_url}
+              onRecorded={({ url }) => setForm(f => ({ ...f, pronunciation_audio_url: url }))}
+              onDelete={() => setForm(f => ({ ...f, pronunciation_audio_url: "" }))}
             />
           </div>
           <Button type="submit" className="w-full" disabled={!form.transliteration || !form.english}>

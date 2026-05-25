@@ -39,6 +39,10 @@
       "default": "other",
       "description": "Word category"
     },
+    "pronunciation_audio_url": {
+      "type": "string",
+      "description": "URL of the recorded pronunciation audio file"
+    },
     "mastery": {
       "type": "number",
       "default": 0,
