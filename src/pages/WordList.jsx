@@ -41,11 +41,14 @@ export default function WordList() {
   const queryClient = useQueryClient();
   const handleRefresh = () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
 
+  const [isAdmin, setIsAdmin] = useState(false);
+
   const { data: words = [], isLoading } = useQuery({
     queryKey: ["vocabulary"],
     queryFn: async () => {
       const user = await base44.auth.me();
-      return base44.entities.Vocabulary.filter({ created_by: user.email }, "-created_date", 500);
+      setIsAdmin(user?.role === "admin");
+      return base44.entities.Vocabulary.list("-created_date", 500);
     },
   });
 
@@ -236,15 +239,17 @@ export default function WordList() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Word List</h1>
-          <p className="text-sm text-muted-foreground mt-1">{words.length} words in your collection</p>
+          <p className="text-sm text-muted-foreground mt-1">{words.length} words</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" className="gap-2" onClick={handleAutoCategorize} disabled={autoCategorizing}>
-            {autoCategorizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            {autoCategorizing ? "Categorizing..." : "Auto-categorize"}
-          </Button>
-          <AddWordDialog onAdd={handleAddWord} />
-        </div>
+        {isAdmin && (
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="outline" className="gap-2" onClick={handleAutoCategorize} disabled={autoCategorizing}>
+              {autoCategorizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+              {autoCategorizing ? "Categorizing..." : "Auto-categorize"}
+            </Button>
+            <AddWordDialog onAdd={handleAddWord} />
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -267,7 +272,7 @@ export default function WordList() {
           </div>
         ) : (
           filtered.map(word => (
-            <WordRow key={word.id} word={word} onDelete={deleteMutation.mutate} onEdit={(id, data) => updateMutation.mutate({ id, data })} />
+            <WordRow key={word.id} word={word} onDelete={deleteMutation.mutate} onEdit={(id, data) => updateMutation.mutate({ id, data })} isAdmin={isAdmin} />
           ))
         )}
       </div>

@@ -87,5 +87,17 @@
   "required": [
     "hindi",
     "english"
-  ]
+  ],
+  "_security": {
+    "read": {},
+    "create": {
+      "rule": "user.role == 'admin'"
+    },
+    "update": {
+      "rule": "user.role == 'admin'"
+    },
+    "delete": {
+      "rule": "user.role == 'admin'"
+    }
+  }
 }

@@ -13,7 +13,7 @@ function getMasteryLabel(mastery) {
   return { label: "New", className: "bg-destructive/10 text-destructive border-destructive/20" };
 }
 
-export default function WordRow({ word, onDelete, onEdit }) {
+export default function WordRow({ word, onDelete, onEdit, isAdmin = false }) {
   const { label, className } = getMasteryLabel(word.mastery || 0);
   const [editOpen, setEditOpen] = useState(false);
 
@@ -30,24 +30,28 @@ export default function WordRow({ word, onDelete, onEdit }) {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <CategoryBadge word={word} onEdit={onEdit} />
+          <CategoryBadge word={word} onEdit={isAdmin ? onEdit : undefined} />
           <Badge variant="outline" className={`text-xs ${className}`}>{label}</Badge>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
-            onClick={() => setEditOpen(true)}
-          >
-            <Pencil className="w-3.5 h-3.5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
-            onClick={() => onDelete(word.id)}
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </Button>
+          {isAdmin && (
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
+                onClick={() => setEditOpen(true)}
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                onClick={() => onDelete(word.id)}
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
+            </>
+          )}
         </div>
       </div>
       {editOpen && (
