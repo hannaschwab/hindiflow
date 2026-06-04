@@ -15,5 +15,6 @@
       "default": false,
       "description": "Whether the default vocabulary has been seeded for this user"
     }
-  }
+  },
+  "required": []
 }

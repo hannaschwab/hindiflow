@@ -7,7 +7,7 @@ export default function PullToRefreshWrapper({ onRefresh, children }) {
   const { pullY, pulling } = usePullToRefresh(onRefresh, containerRef);
 
   return (
-    <div ref={containerRef} className="h-full overflow-auto relative">
+    <div ref={containerRef} className="h-full relative">
       {/* Pull indicator */}
       <div
         className="flex items-center justify-center overflow-hidden transition-all duration-150"

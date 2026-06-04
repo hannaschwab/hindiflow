@@ -39,7 +39,7 @@ export default function AppLayout() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <MobileHeader />
-        <main className="flex-1 overflow-y-auto overflow-x-hidden relative" style={{ WebkitOverflowScrolling: "touch" }}>
+        <main className="flex-1 overflow-hidden relative">
           {/* Persistent pages — stay mounted, hidden when inactive */}
           <KeepAliveRoute path="/" currentPath={location.pathname}>
             <Dashboard />
