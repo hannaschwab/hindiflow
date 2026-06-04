@@ -20,13 +20,20 @@ export default function PronunciationRecorder({ existingUrl, onRecorded, onDelet
   const chunksRef = useRef([]);
   const audioRef = useRef(null);
 
+  const getSupportedMimeType = () => {
+    const types = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus", "audio/ogg"];
+    return types.find(t => MediaRecorder.isTypeSupported(t)) || "";
+  };
+
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mediaRecorder = new MediaRecorder(stream);
+    const mimeType = getSupportedMimeType();
+    const mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+    const usedMime = mediaRecorder.mimeType || mimeType || "audio/webm";
     chunksRef.current = [];
     mediaRecorder.ondataavailable = (e) => chunksRef.current.push(e.data);
     mediaRecorder.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+      const blob = new Blob(chunksRef.current, { type: usedMime });
       const url = URL.createObjectURL(blob);
       setAudioBlob(blob);
       setPreviewUrl(url);
@@ -61,7 +68,8 @@ export default function PronunciationRecorder({ existingUrl, onRecorded, onDelet
   const handleUpload = async () => {
     if (!audioBlob) return;
     setUploading("uploading");
-    const file = new File([audioBlob], "pronunciation.webm", { type: "audio/webm" });
+    const ext = audioBlob.type.includes("mp4") ? "mp4" : audioBlob.type.includes("ogg") ? "ogg" : "webm";
+    const file = new File([audioBlob], `pronunciation.${ext}`, { type: audioBlob.type });
     const { file_url } = await base44.integrations.Core.UploadFile({ file });
     setUploading("done");
     onRecorded({ url: file_url, oldUrl: existingUrl });
