@@ -46,6 +46,7 @@ export default function WordList() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [addWordOpen, setAddWordOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [importMode, setImportMode] = useState("file");
   const photoInputRef = useState(null);
   const [photoInputKey, setPhotoInputKey] = useState(0);
 
@@ -255,10 +256,10 @@ export default function WordList() {
                 <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => setAddWordOpen(true)}>
                   <Plus className="w-4 h-4" /> Add single word
                 </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => setImportOpen(true)}>
+                <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => { setImportMode("file"); setImportOpen(true); }}>
                   <FileText className="w-4 h-4" /> Import from file
                 </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => { setPhotoInputKey(k => k + 1); setTimeout(() => document.getElementById("photo-upload-trigger")?.click(), 50); }}>
+                <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => { setImportMode("photo"); setPhotoInputKey(k => k + 1); setTimeout(() => document.getElementById("photo-upload-trigger")?.click(), 50); }}>
                   <ImageIcon className="w-4 h-4" /> Upload photo
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -281,7 +282,7 @@ export default function WordList() {
               }}
             />
             <AddWordDialog onAdd={handleAddWord} open={addWordOpen} onOpenChange={setAddWordOpen} />
-            <ImportWordsDialog open={importOpen} onOpenChange={setImportOpen} />
+            <ImportWordsDialog open={importOpen} onOpenChange={setImportOpen} mode={importMode} />
           </div>
         )}
       </div>

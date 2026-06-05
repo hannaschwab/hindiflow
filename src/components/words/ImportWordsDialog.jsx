@@ -8,7 +8,7 @@ import { Upload, Sparkles, Loader2, CheckCircle2, FileText, ImageIcon } from "lu
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
-export default function ImportWordsDialog({ open, onOpenChange, defaultTab }) {
+export default function ImportWordsDialog({ open, onOpenChange, defaultTab, mode = "file" }) {
   const [open_internal, setOpenInternal] = useState(false);
   const isControlled = open !== undefined;
   const isOpen = isControlled ? open : open_internal;
@@ -208,19 +208,21 @@ IMPORTANT: Copy Hindi words EXACTLY as shown. For "example_hindi", use romanized
           </div>
 
           {/* File & Photo upload */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className={`grid ${mode === "file" ? "grid-cols-1" : "grid-cols-2"} gap-3`}>
             <label className={`flex flex-col items-center justify-center p-5 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-secondary/30 transition-colors ${isProcessing ? "opacity-50 pointer-events-none" : ""}`}>
               <FileText className="w-6 h-6 text-muted-foreground mb-1.5" />
               <p className="text-sm text-muted-foreground font-medium">Document</p>
               <p className="text-xs text-muted-foreground mt-0.5">CSV, Excel, PDF, JSON</p>
               <input type="file" accept=".csv,.xlsx,.xls,.pdf,.json" className="hidden" onChange={handleFileUpload} disabled={isProcessing} />
             </label>
+            {mode !== "file" && (
             <label className={`flex flex-col items-center justify-center p-5 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-secondary/30 transition-colors ${isProcessing ? "opacity-50 pointer-events-none" : ""}`}>
               <ImageIcon className="w-6 h-6 text-muted-foreground mb-1.5" />
               <p className="text-sm text-muted-foreground font-medium">Photo</p>
               <p className="text-xs text-muted-foreground mt-0.5">JPG, PNG, WEBP</p>
               <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isProcessing} />
             </label>
+            )}
           </div>
 
           {isProcessing && (
