@@ -187,9 +187,9 @@ IMPORTANT: Copy Hindi words EXACTLY as shown. For "example_hindi", use romanized
           {/* Paste text */}
           <div className="space-y-2">
             <p className="text-sm font-medium text-foreground flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-primary" /> Paste from Google Doc
+             <Sparkles className="w-4 h-4 text-primary" /> Copy and paste from document
             </p>
-            <p className="text-xs text-muted-foreground">Copy text from your Google Doc — AI will extract the vocabulary automatically.</p>
+            <p className="text-xs text-muted-foreground">Paste text from any document — AI will extract the vocabulary automatically.</p>
             <Textarea
               placeholder={"Paste your Hindi vocabulary text here...\n\nExample:\nनमस्ते (namaste) - Hello\nधन्यवाद (dhanyavaad) - Thank you"}
               value={text}
