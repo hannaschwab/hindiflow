@@ -3,7 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ChevronDown, Sparkles, Loader2 } from "lucide-react";
+import { Search, ChevronDown, Sparkles, Loader2, Plus, FileText, ImageIcon } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import WordRow from "@/components/words/WordRow";
 import AddWordDialog from "@/components/words/AddWordDialog";
@@ -43,6 +44,10 @@ export default function WordList() {
   const handleRefresh = () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
 
   const [isAdmin, setIsAdmin] = useState(false);
+  const [addWordOpen, setAddWordOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const photoInputRef = useState(null);
+  const [photoInputKey, setPhotoInputKey] = useState(0);
 
   const { data: words = [], isLoading } = useQuery({
     queryKey: ["vocabulary"],
@@ -243,13 +248,48 @@ export default function WordList() {
           <p className="text-sm text-muted-foreground mt-1">{words.length} words</p>
         </div>
         {isAdmin && (
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2 flex-wrap items-center">
             <Button variant="outline" className="gap-2" onClick={handleAutoCategorize} disabled={autoCategorizing}>
               {autoCategorizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {autoCategorizing ? "Categorizing..." : "Auto-categorize"}
             </Button>
-            <ImportWordsDialog />
-            <AddWordDialog onAdd={handleAddWord} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className="gap-2">
+                  <Plus className="w-4 h-4" /> Add Words <ChevronDown className="w-3 h-3 opacity-70" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => setAddWordOpen(true)}>
+                  <Plus className="w-4 h-4" /> Add single word
+                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => setImportOpen(true)}>
+                  <FileText className="w-4 h-4" /> Import from file
+                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => { setPhotoInputKey(k => k + 1); setTimeout(() => document.getElementById("photo-upload-trigger")?.click(), 50); }}>
+                  <ImageIcon className="w-4 h-4" /> Upload photo
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <input
+              id="photo-upload-trigger"
+              key={photoInputKey}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setImportOpen(true);
+                // Small delay to let the dialog mount, then trigger image upload
+                setTimeout(() => {
+                  const evt = new CustomEvent("hindiflow:photo-upload", { detail: { file } });
+                  window.dispatchEvent(evt);
+                }, 200);
+              }}
+            />
+            <AddWordDialog onAdd={handleAddWord} open={addWordOpen} onOpenChange={setAddWordOpen} />
+            <ImportWordsDialog open={importOpen} onOpenChange={setImportOpen} />
           </div>
         )}
       </div>

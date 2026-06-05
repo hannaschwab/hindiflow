@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,23 @@ import { Upload, Sparkles, Loader2, CheckCircle2, FileText, ImageIcon } from "lu
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
-export default function ImportWordsDialog() {
-  const [open, setOpen] = useState(false);
+export default function ImportWordsDialog({ open, onOpenChange, defaultTab }) {
+  const [open_internal, setOpenInternal] = useState(false);
+  const isControlled = open !== undefined;
+  const isOpen = isControlled ? open : open_internal;
+  const setOpen = isControlled ? onOpenChange : setOpenInternal;
+
+  useEffect(() => {
+    const handler = (e) => {
+      const file = e.detail?.file;
+      if (file) {
+        const fakeEvent = { target: { files: [file], value: "" } };
+        handleImageUpload(fakeEvent);
+      }
+    };
+    window.addEventListener("hindiflow:photo-upload", handler);
+    return () => window.removeEventListener("hindiflow:photo-upload", handler);
+  }, []);
   const [text, setText] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState(null);
@@ -155,12 +170,14 @@ IMPORTANT: Copy Hindi words EXACTLY as shown. For "example_hindi", use romanized
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setText(""); setResult(null); } }}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <Upload className="w-4 h-4" /> Import Words
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={(v) => { setOpen(v); if (!v) { setText(""); setResult(null); } }}>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button variant="outline" className="gap-2">
+            <Upload className="w-4 h-4" /> Import Words
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Import Words</DialogTitle>

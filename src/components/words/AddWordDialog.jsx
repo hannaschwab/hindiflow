@@ -9,8 +9,11 @@ import CategoryPicker from "@/components/words/CategoryPicker";
 import { useCategories } from "@/hooks/useCategories";
 import PronunciationRecorder from "@/components/words/PronunciationRecorder";
 
-export default function AddWordDialog({ onAdd }) {
-  const [open, setOpen] = useState(false);
+export default function AddWordDialog({ onAdd, open, onOpenChange }) {
+  const [open_internal, setOpenInternal] = useState(false);
+  const isControlled = open !== undefined;
+  const isOpen = isControlled ? open : open_internal;
+  const setOpen = isControlled ? onOpenChange : setOpenInternal;
   const [categorizing, setCategorizing] = useState(false);
   const { allCategories } = useCategories();
   const [form, setForm] = useState({
@@ -51,12 +54,14 @@ export default function AddWordDialog({ onAdd }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" /> Add Word
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setOpen}>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button className="gap-2">
+            <Plus className="w-4 h-4" /> Add Word
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add New Word</DialogTitle>
