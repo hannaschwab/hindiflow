@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ChevronDown, Sparkles, Loader2, Plus, FileText, ImageIcon } from "lucide-react";
+import { Search, ChevronDown, Plus, FileText, ImageIcon } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import WordRow from "@/components/words/WordRow";
@@ -126,7 +126,6 @@ export default function WordList() {
     if (words.length > 0) handleDeduplicate(true);
   }, [words.length]);
 
-  const [autoCategorizing, setAutoCategorizing] = useState(false);
   const [deduplicating, setDeduplicating] = useState(false);
   const [fixingExamples, setFixingExamples] = useState(false);
 
@@ -187,8 +186,6 @@ export default function WordList() {
   const handleAutoCategorize = async () => {
     const uncategorized = words.filter(w => !w.category || w.category === "other");
     if (uncategorized.length === 0) { toast.info("All words already have a category!"); return; }
-    setAutoCategorizing(true);
-
     // Step 1: Ask LLM for a suggested category for each word
     const proposals = [];
     for (const word of uncategorized) {
@@ -218,7 +215,6 @@ export default function WordList() {
     }
 
     await queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
-    setAutoCategorizing(false);
     toast.success(`Categorized ${updated} of ${uncategorized.length} words! (min ${MIN_CATEGORY_SIZE} per category)`);
   };
 
@@ -249,10 +245,6 @@ export default function WordList() {
         </div>
         {isAdmin && (
           <div className="flex gap-2 flex-wrap items-center">
-            <Button variant="outline" className="gap-2" onClick={handleAutoCategorize} disabled={autoCategorizing}>
-              {autoCategorizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-              {autoCategorizing ? "Categorizing..." : "Auto-categorize"}
-            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button className="gap-2">
