@@ -7,6 +7,7 @@ import { Search, ChevronDown, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import WordRow from "@/components/words/WordRow";
 import AddWordDialog from "@/components/words/AddWordDialog";
+import ImportWordsDialog from "@/components/words/ImportWordsDialog";
 import PullToRefreshWrapper from "@/components/common/PullToRefreshWrapper";
 import CategoryPicker from "@/components/words/CategoryPicker";
 import { useCategories } from "@/hooks/useCategories";
@@ -247,6 +248,7 @@ export default function WordList() {
               {autoCategorizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {autoCategorizing ? "Categorizing..." : "Auto-categorize"}
             </Button>
+            <ImportWordsDialog />
             <AddWordDialog onAdd={handleAddWord} />
           </div>
         )}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { BookOpen, GraduationCap, List, Upload, BarChart3, Sparkles, Trash2, Sun, Moon, Settings, Lightbulb, LogOut, Share2 } from "lucide-react";
+import { BookOpen, GraduationCap, List, BarChart3, Sparkles, Trash2, Sun, Moon, Settings, Lightbulb, LogOut, Share2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,6 @@ const navItems = [
   { path: "/words", label: "Word List", icon: List },
   { path: "/practice", label: "Practice", icon: GraduationCap },
   { path: "/challenge", label: "Sentence Builder", icon: Sparkles },
-  { path: "/import", label: "Import Words", icon: Upload },
 ];
 
 function SettingsDialog() {

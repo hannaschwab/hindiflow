@@ -1,12 +1,11 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { BarChart3, List, GraduationCap, Upload, Sparkles } from "lucide-react";
+import { BarChart3, List, GraduationCap, Sparkles } from "lucide-react";
 
 const navItems = [
   { path: "/", label: "Home", icon: BarChart3 },
   { path: "/words", label: "Words", icon: List },
   { path: "/practice", label: "Practice", icon: GraduationCap },
   { path: "/challenge", label: "Builder", icon: Sparkles },
-  { path: "/import", label: "Import", icon: Upload },
 ];
 
 export default function MobileNav() {
