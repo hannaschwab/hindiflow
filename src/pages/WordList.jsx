@@ -45,20 +45,21 @@ export default function WordList() {
   const [showBookmarked, setShowBookmarked] = useState(false);
   const { bookmarkedWordIds, toggleBookmark } = useBookmarks();
 
-  const [isAdmin, setIsAdmin] = useState(false);
   const [addWordOpen, setAddWordOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [importMode, setImportMode] = useState("file");
   const photoInputRef = useState(null);
   const [photoInputKey, setPhotoInputKey] = useState(0);
 
+  const { data: currentUser } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: () => base44.auth.me(),
+  });
+  const isAdmin = currentUser?.role === "admin";
+
   const { data: words = [], isLoading } = useQuery({
     queryKey: ["vocabulary"],
-    queryFn: async () => {
-      const user = await base44.auth.me();
-      setIsAdmin(user?.role === "admin");
-      return base44.entities.Vocabulary.list("-created_date", 500);
-    },
+    queryFn: () => base44.entities.Vocabulary.list("-created_date", 500),
   });
 
   const createMutation = useMutation({
