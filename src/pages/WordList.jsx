@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
@@ -121,37 +121,6 @@ export default function WordList() {
     createMutation.mutate(newWord);
   };
 
-  useEffect(() => {
-    if (words.length > 0 && isAdmin) handleDeduplicate(true);
-  }, [words.length, isAdmin]);
-
-  const handleDeduplicate = async (silent = false) => {
-    const seen = new Map();
-    const toDelete = [];
-
-    for (const word of [...words].reverse()) {
-      const key = word.transliteration?.toLowerCase().trim();
-      if (seen.has(key)) {
-        const existing = seen.get(key);
-        const updates = {};
-        if (!existing.example_hindi && word.example_hindi) updates.example_hindi = word.example_hindi;
-        if (!existing.example_english && word.example_english) updates.example_english = word.example_english;
-        if (Object.keys(updates).length > 0) {
-          await base44.entities.Vocabulary.update(existing.id, updates);
-        }
-        toDelete.push(word.id);
-      } else {
-        seen.set(key, word);
-      }
-    }
-
-    for (const id of toDelete) {
-      await base44.entities.Vocabulary.delete(id);
-    }
-
-    await queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
-    if (!silent && toDelete.length > 0) toast.success(`Removed ${toDelete.length} duplicate(s)!`);
-  };
 
   const filtered = words.filter(w => {
     const matchSearch = !search || 
