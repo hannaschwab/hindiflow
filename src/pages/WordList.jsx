@@ -122,8 +122,8 @@ export default function WordList() {
   };
 
   useEffect(() => {
-    if (words.length > 0) handleDeduplicate(true);
-  }, [words.length]);
+    if (words.length > 0 && isAdmin) handleDeduplicate(true);
+  }, [words.length, isAdmin]);
 
   const handleDeduplicate = async (silent = false) => {
     const seen = new Map();

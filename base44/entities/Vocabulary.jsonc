@@ -92,45 +92,18 @@
     "hindi",
     "english"
   ],
-  "_security": {
-    "read": {},
-    "create": {
-      "rule": "user.role == 'admin'"
-    },
-    "update": {
-      "rule": "user.role == 'admin'"
-    },
-    "delete": {
-      "rule": "user.role == 'admin'"
-    }
-  },
   "rls": {
     "create": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "user"
-          }
+      "user_condition": {
+        "role": {
+          "$in": [
+            "admin",
+            "user"
+          ]
         }
-      ]
+      }
     },
-    "read": {
-      "$or": [
-        {
-          "created_by_id": "{{user.id}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
+    "read": {},
     "update": {
       "$or": [
         {
