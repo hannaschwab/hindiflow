@@ -9,8 +9,9 @@ import { base44 } from "@/api/base44Client";
  *   existingUrl  - current saved audio URL (if any)
  *   onRecorded   - called with { url, oldUrl } when a new recording is uploaded
  *   onDelete     - called when the existing recording is deleted
+ *   onUploading  - called with true/false during upload
  */
-export default function PronunciationRecorder({ existingUrl, onRecorded, onDelete }) {
+export default function PronunciationRecorder({ existingUrl, onRecorded, onDelete, onUploading }) {
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -32,12 +33,22 @@ export default function PronunciationRecorder({ existingUrl, onRecorded, onDelet
     const usedMime = mediaRecorder.mimeType || mimeType || "audio/webm";
     chunksRef.current = [];
     mediaRecorder.ondataavailable = (e) => chunksRef.current.push(e.data);
-    mediaRecorder.onstop = () => {
+    mediaRecorder.onstop = async () => {
       const blob = new Blob(chunksRef.current, { type: usedMime });
       const url = URL.createObjectURL(blob);
       setAudioBlob(blob);
       setPreviewUrl(url);
       stream.getTracks().forEach(t => t.stop());
+
+      // Auto-upload
+      onUploading?.(true);
+      setUploading("uploading");
+      const ext = blob.type.includes("mp4") ? "mp4" : blob.type.includes("ogg") ? "ogg" : "webm";
+      const file = new File([blob], `pronunciation.${ext}`, { type: blob.type });
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setUploading("done");
+      onRecorded({ url: file_url, oldUrl: existingUrl });
+      onUploading?.(false);
     };
     mediaRecorderRef.current = mediaRecorder;
     mediaRecorder.start();
@@ -65,29 +76,18 @@ export default function PronunciationRecorder({ existingUrl, onRecorded, onDelet
     }
   };
 
-  const handleUpload = async () => {
-    if (!audioBlob) return;
-    setUploading("uploading");
-    const ext = audioBlob.type.includes("mp4") ? "mp4" : audioBlob.type.includes("ogg") ? "ogg" : "webm";
-    const file = new File([audioBlob], `pronunciation.${ext}`, { type: audioBlob.type });
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    setUploading("done");
-    onRecorded({ url: file_url, oldUrl: existingUrl });
-    setAudioBlob(null);
-    setPreviewUrl(null);
-  };
-
   const handleDiscard = () => {
     setAudioBlob(null);
     setPreviewUrl(null);
     setUploading(null);
+    onRecorded({ url: "", oldUrl: existingUrl });
   };
 
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 flex-wrap">
         {/* Recording controls */}
-        {!recording && !audioBlob && (
+        {!recording && !audioBlob && uploading !== "uploading" && (
           <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={startRecording}>
             <Mic className="w-3.5 h-3.5" />
             {existingUrl ? "Re-record" : "Record Pronunciation"}
@@ -100,27 +100,19 @@ export default function PronunciationRecorder({ existingUrl, onRecorded, onDelet
           </Button>
         )}
 
-        {/* Preview + upload controls */}
-        {audioBlob && !recording && (
+        {/* Uploading indicator */}
+        {uploading === "uploading" && (
+          <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…
+          </span>
+        )}
+
+        {/* Preview + discard after upload done */}
+        {audioBlob && uploading === "done" && (
           <>
             <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={handlePreviewPlay}>
               <Play className="w-3.5 h-3.5" />
               {playing ? "Stop" : "Preview"}
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              className="gap-1.5"
-              onClick={handleUpload}
-              disabled={uploading === "uploading"}
-            >
-              {uploading === "uploading" ? (
-                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…</>
-              ) : uploading === "done" ? (
-                <><CheckCircle2 className="w-3.5 h-3.5" /> Saved</>
-              ) : (
-                "Save Recording"
-              )}
             </Button>
             <Button type="button" variant="ghost" size="sm" className="gap-1.5 text-muted-foreground" onClick={handleDiscard}>
               <Trash2 className="w-3.5 h-3.5" /> Discard
@@ -130,21 +122,21 @@ export default function PronunciationRecorder({ existingUrl, onRecorded, onDelet
         )}
 
         {/* Existing audio indicator */}
-        {existingUrl && !audioBlob && !recording && (
-          <span className="flex items-center gap-1 text-xs text-accent">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Pronunciation saved
-          </span>
-        )}
-        {existingUrl && !audioBlob && !recording && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="gap-1.5 text-muted-foreground hover:text-destructive"
-            onClick={onDelete}
-          >
-            <Trash2 className="w-3.5 h-3.5" /> Delete audio
-          </Button>
+        {existingUrl && !audioBlob && !recording && uploading !== "uploading" && (
+          <>
+            <span className="flex items-center gap-1 text-xs text-accent">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Pronunciation saved
+            </span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="gap-1.5 text-muted-foreground hover:text-destructive"
+              onClick={onDelete}
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Delete audio
+            </Button>
+          </>
         )}
       </div>
 

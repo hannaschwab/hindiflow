@@ -13,6 +13,7 @@ export default function AddWordDialog({ onAdd, open, onOpenChange }) {
   const isOpen = isControlled ? open : open_internal;
   const setOpen = isControlled ? onOpenChange : setOpenInternal;
 
+  const [isUploadingAudio, setIsUploadingAudio] = useState(false);
   const [form, setForm] = useState({
     hindi: "", transliteration: "", english: "",
     example_hindi: "", example_english: "", category: "other",
@@ -88,10 +89,11 @@ export default function AddWordDialog({ onAdd, open, onOpenChange }) {
               existingUrl={form.pronunciation_audio_url}
               onRecorded={({ url }) => setForm(f => ({ ...f, pronunciation_audio_url: url }))}
               onDelete={() => setForm(f => ({ ...f, pronunciation_audio_url: "" }))}
+              onUploading={setIsUploadingAudio}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={!form.transliteration || !form.english}>
-            Add Word
+          <Button type="submit" className="w-full" disabled={!form.transliteration || !form.english || isUploadingAudio}>
+            {isUploadingAudio ? "Uploading audio…" : "Add Word"}
           </Button>
         </form>
       </DialogContent>

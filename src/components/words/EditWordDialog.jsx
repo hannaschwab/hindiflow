@@ -8,6 +8,7 @@ import CategoryPicker from "@/components/words/CategoryPicker";
 import PronunciationRecorder from "@/components/words/PronunciationRecorder";
 
 export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
+  const [isUploadingAudio, setIsUploadingAudio] = useState(false);
   const [form, setForm] = useState({
     hindi: word.hindi || "",
     transliteration: word.transliteration || "",
@@ -77,10 +78,11 @@ export default function EditWordDialog({ word, open, onOpenChange, onSave }) {
               existingUrl={form.pronunciation_audio_url}
               onRecorded={({ url }) => setForm(f => ({ ...f, pronunciation_audio_url: url }))}
               onDelete={() => setForm(f => ({ ...f, pronunciation_audio_url: "" }))}
+              onUploading={setIsUploadingAudio}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={!form.transliteration || !form.english}>
-            Save Changes
+          <Button type="submit" className="w-full" disabled={!form.transliteration || !form.english || isUploadingAudio}>
+            {isUploadingAudio ? "Uploading audio…" : "Save Changes"}
           </Button>
         </form>
       </DialogContent>
