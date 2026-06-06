@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import SpeakButton from "@/components/common/SpeakButton";
+import PronunciationPlayer from "@/components/words/PronunciationPlayer";
 
 export default function RecentWords({ words }) {
   const recent = [...words]
@@ -30,7 +30,7 @@ export default function RecentWords({ words }) {
             >
               <div className="flex items-center gap-2">
                 <span className="text-base font-semibold text-foreground">{word.transliteration || word.hindi}</span>
-                <SpeakButton text={word.hindi} lang="hi-IN" className="h-7 w-7" />
+                {word.pronunciation_audio_url && <PronunciationPlayer url={word.pronunciation_audio_url} />}
               </div>
               <span className="text-sm text-muted-foreground">{word.english}</span>
             </motion.div>
