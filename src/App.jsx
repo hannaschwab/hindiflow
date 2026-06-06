@@ -11,7 +11,6 @@ import AppLayout from './components/layout/AppLayout';
 import Dashboard from './pages/Dashboard';
 import WordList from './pages/WordList';
 import Practice from './pages/Practice';
-import ImportWords from './pages/ImportWords';
 import SentenceChallenge from './pages/SentenceChallenge';
 
 const pageVariants = {
@@ -38,7 +37,6 @@ const AnimatedOutlet = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path="/words" element={<WordList />} />
             <Route path="/practice" element={<Practice />} />
-            <Route path="/import" element={<ImportWords />} />
             <Route path="/challenge" element={<SentenceChallenge />} />
           </Route>
           <Route path="*" element={<PageNotFound />} />

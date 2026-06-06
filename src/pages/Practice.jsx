@@ -7,6 +7,7 @@ import { Check, X, Shuffle, ArrowRight, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Flashcard from "@/components/practice/Flashcard";
 import { computeSRS, getDueWords, countPracticedToday, todayStr } from "@/lib/srs";
+import { useStreak } from "@/hooks/useStreak";
 
 const DAILY_GOAL = 5;
 
@@ -17,6 +18,7 @@ export default function Practice() {
   const [deck, setDeck] = useState(null);
   const [direction, setDirection] = useState("english_to_hindi");
   const queryClient = useQueryClient();
+  const { streak, recordPracticeSession } = useStreak();
 
   const { data: words = [], isLoading } = useQuery({
     queryKey: ["vocabulary"],
@@ -45,7 +47,7 @@ export default function Practice() {
   const startPractice = useCallback((mode) => {
     let selectedWords = [...words];
     if (mode === "weak") {
-      selectedWords = selectedWords.filter(w => (w.mastery || 0) < 50);
+      selectedWords = selectedWords.filter(w => (w.mastery || 0) < 50 && (w.times_practiced || 0) >= 3);
       if (selectedWords.length === 0) selectedWords = [...words];
     } else if (mode === "srs") {
       selectedWords = getDueWords(words);
@@ -91,6 +93,7 @@ export default function Practice() {
     if (currentIndex < deck.length - 1) {
       setCurrentIndex(prev => prev + 1);
     } else {
+      recordPracticeSession();
       setDeck(null); // Session complete
     }
   };
@@ -147,7 +150,7 @@ export default function Practice() {
 
   // No active session - show mode selection
   if (!deck) {
-    const weakCount = words.filter(w => (w.mastery || 0) < 50).length;
+    const weakCount = words.filter(w => (w.mastery || 0) < 50 && (w.times_practiced || 0) >= 3).length;
     const dueCount = getDueWords(words).length;
     const practicedToday = countPracticedToday(words);
     const goalDone = practicedToday >= DAILY_GOAL;
@@ -173,6 +176,17 @@ export default function Practice() {
               EN → Hindi
             </button>
           </div>
+        </div>
+
+        {/* Streak badge */}
+        <div className="mb-3 flex items-center gap-2">
+          {streak >= 1 ? (
+            <span className="text-sm font-semibold text-primary flex items-center gap-1">
+              🔥 {streak}-day streak — keep it up!
+            </span>
+          ) : (
+            <span className="text-sm text-muted-foreground">Start your streak today!</span>
+          )}
         </div>
 
         {/* Daily goal bar */}

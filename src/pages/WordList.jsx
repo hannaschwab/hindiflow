@@ -13,8 +13,6 @@ import PullToRefreshWrapper from "@/components/common/PullToRefreshWrapper";
 import CategoryPicker from "@/components/words/CategoryPicker";
 import { useCategories } from "@/hooks/useCategories";
 
-const MIN_CATEGORY_SIZE = 5;
-
 function CategorySelect({ value, onChange }) {
   const { allCategories } = useCategories();
   const label = value === "all" ? "All Categories" : value.replace(/_/g, " ");
@@ -127,11 +125,7 @@ export default function WordList() {
     if (words.length > 0) handleDeduplicate(true);
   }, [words.length]);
 
-  const [deduplicating, setDeduplicating] = useState(false);
-  const [fixingExamples, setFixingExamples] = useState(false);
-
   const handleDeduplicate = async (silent = false) => {
-    setDeduplicating(true);
     const seen = new Map();
     const toDelete = [];
 
@@ -139,7 +133,6 @@ export default function WordList() {
       const key = word.transliteration?.toLowerCase().trim();
       if (seen.has(key)) {
         const existing = seen.get(key);
-        // Merge examples into the keeper if it's missing them
         const updates = {};
         if (!existing.example_hindi && word.example_hindi) updates.example_hindi = word.example_hindi;
         if (!existing.example_english && word.example_english) updates.example_english = word.example_english;
@@ -157,66 +150,7 @@ export default function WordList() {
     }
 
     await queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
-    setDeduplicating(false);
-    if (!silent) toast.success(toDelete.length > 0 ? `Removed ${toDelete.length} duplicate(s)!` : "No duplicates found.");
-    else if (toDelete.length > 0) toast.success(`Removed ${toDelete.length} duplicate(s)!`);
-  };
-  const { addCategory } = useCategories();
-
-  const handleFixExamples = async () => {
-    const devanagariRegex = /[\u0900-\u097F]/;
-    const toFix = words.filter(w => w.example_hindi && devanagariRegex.test(w.example_hindi));
-    if (toFix.length === 0) { toast.info("All examples are already in transliteration!"); return; }
-    setFixingExamples(true);
-    let updated = 0;
-    for (const word of toFix) {
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Transliterate this Hindi sentence into romanized Latin script only (e.g. "Mujhe kaam karna hai"). Output only the transliteration, nothing else.\n\nHindi: "${word.example_hindi}"`,
-        response_json_schema: { type: "object", properties: { transliteration: { type: "string" } } }
-      });
-      if (result?.transliteration) {
-        await base44.entities.Vocabulary.update(word.id, { example_hindi: result.transliteration });
-        updated++;
-      }
-    }
-    await queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
-    setFixingExamples(false);
-    toast.success(`Converted ${updated} examples to transliteration!`);
-  };
-
-  const handleAutoCategorize = async () => {
-    const uncategorized = words.filter(w => !w.category || w.category === "other");
-    if (uncategorized.length === 0) { toast.info("All words already have a category!"); return; }
-    // Step 1: Ask LLM for a suggested category for each word
-    const proposals = [];
-    for (const word of uncategorized) {
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Categorize the Hindi word "${word.hindi}" (meaning: "${word.english}") into a short, descriptive category name (e.g. greetings, food, travel, numbers, family, colors, verbs, adjectives, phrases, body parts, emotions, clothing, animals, time, etc). Reply with only the lowercase category name, nothing else.`,
-        response_json_schema: { type: "object", properties: { category: { type: "string" } } }
-      });
-      const suggested = result?.category?.toLowerCase().trim().replace(/\s+/g, "_") || "other";
-      proposals.push({ word, suggested });
-    }
-
-    // Step 2: Count occurrences of each proposed category
-    const counts = {};
-    for (const { suggested } of proposals) {
-      counts[suggested] = (counts[suggested] || 0) + 1;
-    }
-
-    // Step 3: Save only categories that have >= MIN_CATEGORY_SIZE words; register new ones
-    let updated = 0;
-    for (const { word, suggested } of proposals) {
-      const finalCat = (counts[suggested] >= MIN_CATEGORY_SIZE) ? suggested : "other";
-      if (finalCat !== "other") {
-        addCategory(finalCat);
-        await base44.entities.Vocabulary.update(word.id, { category: finalCat });
-        updated++;
-      }
-    }
-
-    await queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
-    toast.success(`Categorized ${updated} of ${uncategorized.length} words! (min ${MIN_CATEGORY_SIZE} per category)`);
+    if (!silent && toDelete.length > 0) toast.success(`Removed ${toDelete.length} duplicate(s)!`);
   };
 
   const filtered = words.filter(w => {

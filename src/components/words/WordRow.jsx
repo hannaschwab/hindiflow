@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trash2, Pencil } from "lucide-react";
-import SpeakButton from "@/components/common/SpeakButton";
 import EditWordDialog from "@/components/words/EditWordDialog";
 import CategoryBadge from "@/components/words/CategoryBadge";
 import PronunciationPlayer from "@/components/words/PronunciationPlayer";
@@ -25,8 +24,7 @@ export default function WordRow({ word, onDelete, onEdit, isAdmin = false }) {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="text-base font-semibold text-foreground">{word.transliteration || word.hindi}</span>
-              <SpeakButton text={word.transliteration || word.hindi} lang="hi-IN" className="h-7 w-7" />
-              <PronunciationPlayer url={word.pronunciation_audio_url} />
+              {word.pronunciation_audio_url && <PronunciationPlayer url={word.pronunciation_audio_url} />}
             </div>
             <p className="text-sm text-muted-foreground truncate">{word.english}</p>
           </div>

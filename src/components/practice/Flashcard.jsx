@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { RotateCcw } from "lucide-react";
-import SpeakButton from "@/components/common/SpeakButton";
+import PronunciationPlayer from "@/components/words/PronunciationPlayer";
 
 // direction: "hindi_to_english" (default) | "english_to_hindi"
 export default function Flashcard({ word, showAnswer, onFlip, direction = "hindi_to_english" }) {
@@ -28,9 +28,11 @@ export default function Flashcard({ word, showAnswer, onFlip, direction = "hindi
               {hindiFirst ? (
                 <>
                   <p className="text-4xl font-bold text-foreground mb-2">{word.transliteration || word.hindi}</p>
-                  <div className="flex items-center justify-center gap-2 mt-1">
-                    <SpeakButton text={word.hindi} lang="hi-IN" />
-                  </div>
+                  {word.pronunciation_audio_url && (
+                    <div className="flex items-center justify-center gap-2 mt-1">
+                      <PronunciationPlayer url={word.pronunciation_audio_url} />
+                    </div>
+                  )}
                 </>
               ) : (
                 <p className="text-3xl font-bold text-foreground mb-2">{word.english}</p>
@@ -56,9 +58,11 @@ export default function Flashcard({ word, showAnswer, onFlip, direction = "hindi
               ) : (
                 <>
                   <p className="text-4xl font-bold text-foreground mb-2">{word.transliteration || word.hindi}</p>
-                  <div className="flex items-center justify-center gap-2 mt-1">
-                    <SpeakButton text={word.hindi} lang="hi-IN" />
-                  </div>
+                  {word.pronunciation_audio_url && (
+                    <div className="flex items-center justify-center gap-2 mt-1">
+                      <PronunciationPlayer url={word.pronunciation_audio_url} />
+                    </div>
+                  )}
                   {word.example_hindi && (
                     <div className="mt-4 p-3 bg-secondary/50 rounded-xl">
                       <p className="text-sm text-foreground italic font-inter">{word.example_hindi}</p>

@@ -11,6 +11,7 @@ import DailyGoal from "@/components/dashboard/DailyGoal";
 import PullToRefreshWrapper from "@/components/common/PullToRefreshWrapper";
 import WelcomeNameDialog from "@/components/common/WelcomeNameDialog";
 import { useGreetingName } from "@/hooks/useGreetingName";
+import { useStreak } from "@/hooks/useStreak";
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
@@ -22,6 +23,7 @@ export default function Dashboard() {
     },
   });
   const { greetingName, isLoading: nameLoading, saveName } = useGreetingName();
+  const { streak } = useStreak();
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const handleRefresh = () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
@@ -61,7 +63,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard title="Total Words" value={totalWords} icon={BookOpen} color="bg-primary/10 text-primary" />
         <StatCard title="Mastered" value={mastered} subtitle={totalWords > 0 ? `${Math.round(mastered / totalWords * 100)}%` : "—"} icon={Target} color="bg-accent/10 text-accent" />
-        <StatCard title="Practiced" value={practiced} icon={Flame} color="bg-chart-5/10 text-chart-5" />
+        <StatCard title="Day Streak" value={streak >= 1 ? `🔥 ${streak}` : "—"} subtitle={streak >= 1 ? `${streak} day${streak !== 1 ? "s" : ""}` : "Start today!"} icon={Flame} color="bg-primary/10 text-primary" />
         <StatCard title="Avg Mastery" value={`${avgMastery}%`} icon={TrendingUp} color="bg-chart-4/10 text-chart-4" />
       </div>
 
