@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Flashcard from "@/components/practice/Flashcard";
 import { computeSRS, getDueWords, countPracticedToday, todayStr } from "@/lib/srs";
 import { useStreak } from "@/hooks/useStreak";
+import { useBookmarks } from "@/hooks/useBookmarks";
 
 const DAILY_GOAL = 5;
 
@@ -19,6 +20,7 @@ export default function Practice() {
   const [direction, setDirection] = useState("english_to_hindi");
   const queryClient = useQueryClient();
   const { streak, recordPracticeSession } = useStreak();
+  const { bookmarkedWordIds, toggleBookmark } = useBookmarks();
 
   const { data: words = [], isLoading } = useQuery({
     queryKey: ["vocabulary"],
@@ -296,7 +298,7 @@ export default function Practice() {
         />
       </div>
 
-      <Flashcard word={word} showAnswer={showAnswer} onFlip={() => setShowAnswer(!showAnswer)} direction={direction} />
+      <Flashcard word={word} showAnswer={showAnswer} onFlip={() => setShowAnswer(!showAnswer)} direction={direction} isBookmarked={bookmarkedWordIds.has(word.id)} onToggleBookmark={toggleBookmark} />
 
       <AnimatePresence>
         {showAnswer && (

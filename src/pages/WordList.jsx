@@ -3,7 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ChevronDown, Plus, FileText, ImageIcon } from "lucide-react";
+import { Search, ChevronDown, Plus, FileText, ImageIcon, Star } from "lucide-react";
+import { useBookmarks } from "@/hooks/useBookmarks";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import WordRow from "@/components/words/WordRow";
@@ -40,6 +41,9 @@ export default function WordList() {
   const [category, setCategory] = useState("all");
   const queryClient = useQueryClient();
   const handleRefresh = () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] });
+
+  const [showBookmarked, setShowBookmarked] = useState(false);
+  const { bookmarkedWordIds, toggleBookmark } = useBookmarks();
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [addWordOpen, setAddWordOpen] = useState(false);
@@ -128,7 +132,8 @@ export default function WordList() {
       w.english?.toLowerCase().includes(search.toLowerCase()) ||
       w.transliteration?.toLowerCase().includes(search.toLowerCase());
     const matchCategory = category === "all" || w.category === category;
-    return matchSearch && matchCategory;
+    const matchBookmark = !showBookmarked || bookmarkedWordIds.has(w.id);
+    return matchSearch && matchCategory && matchBookmark;
   });
 
   if (isLoading) {
@@ -201,6 +206,14 @@ export default function WordList() {
           />
         </div>
         <CategorySelect value={category} onChange={setCategory} />
+        <Button
+          variant={showBookmarked ? "default" : "outline"}
+          className="gap-2 shrink-0"
+          onClick={() => setShowBookmarked(v => !v)}
+        >
+          <Star className={`w-4 h-4 ${showBookmarked ? "fill-primary-foreground" : ""}`} />
+          Saved
+        </Button>
       </div>
 
       <div className="bg-card rounded-2xl border border-border shadow-sm divide-y divide-border">
@@ -210,7 +223,7 @@ export default function WordList() {
           </div>
         ) : (
           filtered.map(word => (
-            <WordRow key={word.id} word={word} onDelete={deleteMutation.mutate} onEdit={(id, data) => updateMutation.mutate({ id, data })} isAdmin={isAdmin} />
+            <WordRow key={word.id} word={word} onDelete={deleteMutation.mutate} onEdit={(id, data) => updateMutation.mutate({ id, data })} isAdmin={isAdmin} isBookmarked={bookmarkedWordIds.has(word.id)} onToggleBookmark={toggleBookmark} />
           ))
         )}
       </div>

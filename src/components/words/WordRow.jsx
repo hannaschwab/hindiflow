@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trash2, Pencil } from "lucide-react";
+import { Trash2, Pencil, Star } from "lucide-react";
 import EditWordDialog from "@/components/words/EditWordDialog";
 import CategoryBadge from "@/components/words/CategoryBadge";
 import PronunciationPlayer from "@/components/words/PronunciationPlayer";
@@ -13,7 +13,7 @@ function getMasteryLabel(mastery) {
   return { label: "New", className: "bg-destructive/10 text-destructive border-destructive/20" };
 }
 
-export default function WordRow({ word, onDelete, onEdit, isAdmin = false }) {
+export default function WordRow({ word, onDelete, onEdit, isAdmin = false, isBookmarked = false, onToggleBookmark }) {
   const { label, className } = getMasteryLabel(word.mastery || 0);
   const [editOpen, setEditOpen] = useState(false);
 
@@ -32,6 +32,16 @@ export default function WordRow({ word, onDelete, onEdit, isAdmin = false }) {
         <div className="flex items-center gap-3">
           <CategoryBadge word={word} onEdit={isAdmin ? onEdit : undefined} />
           <Badge variant="outline" className={`text-xs ${className}`}>{label}</Badge>
+          {onToggleBookmark && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`h-8 w-8 transition-all ${isBookmarked ? "opacity-100 text-chart-3" : "opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-chart-3"}`}
+              onClick={(e) => { e.stopPropagation(); onToggleBookmark(word.id); }}
+            >
+              <Star className={`w-3.5 h-3.5 ${isBookmarked ? "fill-chart-3" : ""}`} />
+            </Button>
+          )}
           {isAdmin && (
             <>
               <Button

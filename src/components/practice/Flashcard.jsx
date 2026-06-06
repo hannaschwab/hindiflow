@@ -1,9 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Star } from "lucide-react";
 import PronunciationPlayer from "@/components/words/PronunciationPlayer";
 
 // direction: "hindi_to_english" (default) | "english_to_hindi"
-export default function Flashcard({ word, showAnswer, onFlip, direction = "hindi_to_english" }) {
+export default function Flashcard({ word, showAnswer, onFlip, direction = "hindi_to_english", isBookmarked = false, onToggleBookmark }) {
   const hindiFirst = direction === "hindi_to_english";
 
   return (
@@ -18,8 +18,16 @@ export default function Flashcard({ word, showAnswer, onFlip, direction = "hindi
           animate={{ rotateY: 0, opacity: 1 }}
           exit={{ rotateY: -90, opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="bg-card rounded-3xl border border-border shadow-lg p-10 min-h-[280px] flex flex-col items-center justify-center text-center relative"
+          className="bg-card rounded-3xl border border-border shadow-lg p-10 min-h-[280px] flex flex-col items-center justify-center text-center relative select-none"
         >
+          {onToggleBookmark && (
+            <button
+              className={`absolute top-4 right-4 p-1.5 rounded-full transition-colors hover:bg-secondary ${isBookmarked ? "text-chart-3" : "text-muted-foreground"}`}
+              onClick={(e) => { e.stopPropagation(); onToggleBookmark(word.id); }}
+            >
+              <Star className={`w-4 h-4 ${isBookmarked ? "fill-chart-3" : ""}`} />
+            </button>
+          )}
           {!showAnswer ? (
             <>
               <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
