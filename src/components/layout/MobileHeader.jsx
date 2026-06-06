@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, Settings, Trash2, Sun, Moon, Lightbulb, LogOut, Share2 } from "lucide-react";
+import { ChevronLeft, Settings, Trash2, Sun, Moon, Lightbulb, LogOut, Share2, Smartphone } from "lucide-react";
+import InstallGuideDialog from "@/components/common/InstallGuideDialog";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -31,7 +32,9 @@ export default function MobileHeader() {
   const [nameInput, setNameInput] = useState("");
   const [suggestion, setSuggestion] = useState("");
   const [sending, setSending] = useState(false);
+  const [installOpen, setInstallOpen] = useState(false);
   const { toast: shadToast } = useToast();
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   useEffect(() => { setNameInput(greetingName); }, [greetingName]);
 
@@ -138,6 +141,16 @@ export default function MobileHeader() {
                 {sending ? "Sending…" : "Send Suggestion"}
               </button>
             </div>
+            {isMobile && (
+              <div className="border-t border-border pt-4">
+                <button
+                  onClick={() => setInstallOpen(true)}
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors w-full"
+                >
+                  <Smartphone className="w-4 h-4" /> Install HindiFlow App
+                </button>
+              </div>
+            )}
             <div className="border-t border-border pt-4">
               <button
                 onClick={handleShare}
@@ -182,6 +195,7 @@ export default function MobileHeader() {
           </div>
         </DrawerContent>
       </Drawer>
+      <InstallGuideDialog open={installOpen} onOpenChange={setInstallOpen} />
     </>
   );
 }
