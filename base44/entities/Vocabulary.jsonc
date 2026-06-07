@@ -56,16 +56,6 @@
         "role": "admin"
       }
     },
-    "read": {
-      "user_condition": {
-        "role": {
-          "$in": [
-            "admin",
-            "user"
-          ]
-        }
-      }
-    },
     "update": {
       "user_condition": {
         "role": "admin"
