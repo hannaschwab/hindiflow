@@ -12,8 +12,8 @@ import { useToast } from "@/components/ui/use-toast";
 
 const navItems = [
   { path: "/", label: "Dashboard", icon: BarChart3 },
-  { path: "/words", label: "Word List", icon: List },
   { path: "/practice", label: "Practice", icon: GraduationCap },
+  { path: "/words", label: "Word List", icon: List },
   { path: "/challenge", label: "Sentence Builder", icon: Sparkles },
 ];
 

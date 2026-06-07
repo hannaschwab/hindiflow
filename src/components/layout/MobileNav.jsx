@@ -3,8 +3,8 @@ import { BarChart3, List, GraduationCap, Sparkles } from "lucide-react";
 
 const navItems = [
   { path: "/", label: "Home", icon: BarChart3 },
-  { path: "/words", label: "Words", icon: List },
   { path: "/practice", label: "Practice", icon: GraduationCap },
+  { path: "/words", label: "Words", icon: List },
   { path: "/challenge", label: "Builder", icon: Sparkles },
 ];
 
