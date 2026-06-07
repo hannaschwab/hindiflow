@@ -3,7 +3,8 @@ import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-mo
 import { RotateCcw, Star, Check, X } from "lucide-react";
 import PronunciationPlayer from "@/components/words/PronunciationPlayer";
 
-const SWIPE_THRESHOLD = 120;
+const SWIPE_THRESHOLD = 70;
+const VELOCITY_THRESHOLD = 200;
 
 // direction: "hindi_to_english" (default) | "english_to_hindi"
 export default function Flashcard({ word, showAnswer, onFlip, onAnswer, direction = "hindi_to_english", isBookmarked = false, onToggleBookmark }) {
@@ -14,9 +15,12 @@ export default function Flashcard({ word, showAnswer, onFlip, onAnswer, directio
   const redOpacity = useTransform(x, [-SWIPE_THRESHOLD, 0], [1, 0]);
 
   const handleDragEnd = (_e, info) => {
-    if (info.offset.x > SWIPE_THRESHOLD) {
+    if (!showAnswer) return;
+    const { x: dx } = info.offset;
+    const { x: vx } = info.velocity;
+    if (dx > SWIPE_THRESHOLD || vx > VELOCITY_THRESHOLD) {
       onAnswer?.(true);
-    } else if (info.offset.x < -SWIPE_THRESHOLD) {
+    } else if (dx < -SWIPE_THRESHOLD || vx < -VELOCITY_THRESHOLD) {
       onAnswer?.(false);
     }
   };
@@ -24,13 +28,13 @@ export default function Flashcard({ word, showAnswer, onFlip, onAnswer, directio
   return (
     <div className="w-full max-w-md mx-auto select-none touch-pan-y">
       <motion.div
-        drag="x"
+        drag={showAnswer ? "x" : false}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.7}
         style={{ x, rotate }}
         onDragEnd={handleDragEnd}
         onClick={onFlip}
-        className="relative cursor-grab active:cursor-grabbing perspective-1000"
+        className={`relative perspective-1000 ${showAnswer ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}`}
       >
         <AnimatePresence mode="wait">
           <motion.div
