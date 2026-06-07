@@ -12,13 +12,16 @@ import PullToRefreshWrapper from "@/components/common/PullToRefreshWrapper";
 import WelcomeNameDialog from "@/components/common/WelcomeNameDialog";
 import { useGreetingName } from "@/hooks/useGreetingName";
 import { useStreak } from "@/hooks/useStreak";
+import { useWordProgress } from "@/hooks/useWordProgress";
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
-  const { data: words = [], isLoading } = useQuery({
+  const { data: rawWords = [], isLoading: wordsLoading } = useQuery({
     queryKey: ["vocabulary"],
     queryFn: () => base44.entities.Vocabulary.list("-created_date", 500),
   });
+  const { mergedWords: words, isLoading: progressLoading } = useWordProgress(rawWords);
+  const isLoading = wordsLoading || progressLoading;
   const { greetingName, isLoading: nameLoading, saveName } = useGreetingName();
   const { streak } = useStreak();
   const hour = new Date().getHours();

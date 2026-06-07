@@ -9,6 +9,7 @@ import Flashcard from "@/components/practice/Flashcard";
 import { computeSRS, getDueWords, countPracticedToday, todayStr } from "@/lib/srs";
 import { useStreak } from "@/hooks/useStreak";
 import { useBookmarks } from "@/hooks/useBookmarks";
+import { useWordProgress } from "@/hooks/useWordProgress";
 
 const DAILY_GOAL = 5;
 
@@ -22,25 +23,33 @@ export default function Practice() {
   const { streak, recordPracticeSession } = useStreak();
   const { bookmarkedWordIds, toggleBookmark } = useBookmarks();
 
-  const { data: words = [], isLoading } = useQuery({
+  const { data: rawWords = [], isLoading: wordsLoading } = useQuery({
     queryKey: ["vocabulary"],
     queryFn: () => base44.entities.Vocabulary.list("-created_date", 500),
   });
 
+  const { mergedWords: words, isLoading: progressLoading } = useWordProgress(rawWords);
+  const isLoading = wordsLoading || progressLoading;
+
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Vocabulary.update(id, data),
-    onMutate: async ({ id, data }) => {
-      await queryClient.cancelQueries({ queryKey: ["vocabulary"] });
-      const previous = queryClient.getQueryData(["vocabulary"]);
-      queryClient.setQueryData(["vocabulary"], (old = []) =>
-        old.map(w => w.id === id ? { ...w, ...data } : w)
-      );
-      return { previous };
+    mutationFn: async ({ word, data }) => {
+      const progressFields = {
+        times_practiced: data.times_practiced,
+        times_correct: data.times_correct,
+        mastery: data.mastery,
+        last_practiced: data.last_practiced,
+        last_practiced_date: data.last_practiced_date,
+        srs_interval: data.srs_interval,
+        srs_ease: data.srs_ease,
+        next_review: data.next_review,
+      };
+      if (word._progress_id) {
+        return base44.entities.UserProgress.update(word._progress_id, progressFields);
+      } else {
+        return base44.entities.UserProgress.create({ word_id: word.id, ...progressFields });
+      }
     },
-    onError: (_err, _vars, context) => {
-      if (context?.previous) queryClient.setQueryData(["vocabulary"], context.previous);
-    },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ["vocabulary"] }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["userProgress"] }),
   });
 
   const startPractice = useCallback((mode) => {
@@ -72,7 +81,7 @@ export default function Practice() {
     const srsFields = computeSRS(word, correct);
 
     updateMutation.mutate({
-      id: word.id,
+      word,
       data: {
         times_practiced: newPracticed,
         times_correct: newCorrect,

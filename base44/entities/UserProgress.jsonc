@@ -1,0 +1,73 @@
+{
+  "name": "UserProgress",
+  "type": "object",
+  "properties": {
+    "word_id": {
+      "type": "string",
+      "description": "ID of the Vocabulary word this progress belongs to"
+    },
+    "mastery": {
+      "type": "number",
+      "default": 0,
+      "description": "Mastery level 0-100"
+    },
+    "times_practiced": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of times practiced"
+    },
+    "times_correct": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of correct answers"
+    },
+    "last_practiced": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last practice timestamp"
+    },
+    "next_review": {
+      "type": "string",
+      "format": "date-time",
+      "description": "SRS: next scheduled review date"
+    },
+    "srs_interval": {
+      "type": "number",
+      "default": 1,
+      "description": "SRS: current interval in days"
+    },
+    "srs_ease": {
+      "type": "number",
+      "default": 2.5,
+      "description": "SRS: ease factor (SM-2)"
+    },
+    "last_practiced_date": {
+      "type": "string",
+      "description": "Date string YYYY-MM-DD of last practice (for daily goal)"
+    }
+  },
+  "required": [
+    "word_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": {
+          "$in": [
+            "admin",
+            "user"
+          ]
+        }
+      }
+    },
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}
