@@ -55,7 +55,7 @@ export default function WordList() {
     queryKey: ["currentUser"],
     queryFn: () => base44.auth.me(),
   });
-  const isAdmin = !!currentUser;
+  const isAdmin = currentUser?.role === "admin";
 
   const { data: words = [], isLoading } = useQuery({
     queryKey: ["vocabulary"],
