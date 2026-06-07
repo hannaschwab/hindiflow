@@ -298,7 +298,7 @@ export default function Practice() {
         />
       </div>
 
-      <Flashcard word={word} showAnswer={showAnswer} onFlip={() => setShowAnswer(!showAnswer)} direction={direction} isBookmarked={bookmarkedWordIds.has(word.id)} onToggleBookmark={toggleBookmark} />
+      <Flashcard word={word} showAnswer={showAnswer} onFlip={() => setShowAnswer(!showAnswer)} onAnswer={handleAnswer} direction={direction} isBookmarked={bookmarkedWordIds.has(word.id)} onToggleBookmark={toggleBookmark} />
 
       <AnimatePresence>
         {showAnswer && (
@@ -306,7 +306,7 @@ export default function Practice() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="flex justify-center gap-4 mt-8"
+            className="hidden md:flex justify-center gap-4 mt-8"
           >
             <Button
               variant="outline"
