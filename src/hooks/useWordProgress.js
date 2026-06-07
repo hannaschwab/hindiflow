@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 
 /**
  * Fetches the current user's progress records and merges them with vocabulary words.
- * Returns an array of words enriched with the user's personal progress fields.
+ * Falls back to progress fields stored directly on the word (legacy format).
  */
 export function useWordProgress(words = []) {
   const { data: progressList = [], isLoading } = useQuery({
@@ -18,22 +18,20 @@ export function useWordProgress(words = []) {
     progressMap[p.word_id] = p;
   }
 
-  // Merge words with their progress
+  // Merge words with their progress, falling back to legacy fields on the word itself
   const mergedWords = words.map(word => {
-    const p = progressMap[word.id] || {};
+    const p = progressMap[word.id];
     return {
       ...word,
-      // progress fields with defaults
-      mastery: p.mastery ?? 0,
-      times_practiced: p.times_practiced ?? 0,
-      times_correct: p.times_correct ?? 0,
-      last_practiced: p.last_practiced ?? null,
-      last_practiced_date: p.last_practiced_date ?? null,
-      next_review: p.next_review ?? null,
-      srs_interval: p.srs_interval ?? 1,
-      srs_ease: p.srs_ease ?? 2.5,
-      // keep a reference to the progress record id (for updates)
-      _progress_id: p.id ?? null,
+      mastery: p?.mastery ?? word.mastery ?? 0,
+      times_practiced: p?.times_practiced ?? word.times_practiced ?? 0,
+      times_correct: p?.times_correct ?? word.times_correct ?? 0,
+      last_practiced: p?.last_practiced ?? word.last_practiced ?? null,
+      last_practiced_date: p?.last_practiced_date ?? word.last_practiced_date ?? null,
+      next_review: p?.next_review ?? word.next_review ?? null,
+      srs_interval: p?.srs_interval ?? word.srs_interval ?? 1,
+      srs_ease: p?.srs_ease ?? word.srs_ease ?? 2.5,
+      _progress_id: p?.id ?? null,
     };
   });
 
